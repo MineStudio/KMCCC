@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 
 using Microsoft.Win32;
+using Microsoft.VisualBasic.Devices;
 
 namespace KMCCC.Tools
 {
@@ -40,6 +41,11 @@ namespace KMCCC.Tools
 				return null;
 			}
 			catch { return null; }
+		}
+
+		public static UInt64 GetTotalMemory()
+		{
+			return new Computer().Info.TotalPhysicalMemory;
 		}
 
 		public static String GetArch()
