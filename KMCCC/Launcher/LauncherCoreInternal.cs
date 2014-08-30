@@ -25,7 +25,7 @@ namespace KMCCC.Launcher
 				if (String.IsNullOrWhiteSpace(jver.Id)) { return null; }
 				if (String.IsNullOrWhiteSpace(jver.MinecraftArguments)) { return null; }
 				if (String.IsNullOrWhiteSpace(jver.MainClass)) { return null; }
-				if (String.IsNullOrWhiteSpace(jver.Assets)) { return null; }
+				if (String.IsNullOrWhiteSpace(jver.Assets)) { jver.Assets = "legacy"; }
 				if (jver.Libraries == null) { return null; }
 				ver.Id = jver.Id;
 				ver.MinecraftArguments = jver.MinecraftArguments;

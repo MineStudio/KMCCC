@@ -78,22 +78,22 @@ namespace KMCCC.Launcher
 			StringBuilder sb = new StringBuilder();
 			if (CGCEnabled) { sb.Append("-Xincgc"); }
 			if (MinMemory > 0) { sb.Append(" -Xms").Append(MinMemory).Append("M "); }
-			if (MaxMemory > 0) { sb.Append(" -Xmx").Append(MaxMemory).Append("M "); }
+			if (MaxMemory > 0) { sb.Append(" -Xmx").Append(MaxMemory).Append("M"); }
 			else
 			{
 				sb.Append("-Xmx2048M ");
 			}
-			sb.Append("-Djava.library.path=\"").Append(NativePath);
+			foreach (var adv in AdvencedArguments)
+			{
+				sb.Append(' ').Append(adv);
+			}
+			sb.Append(" -Djava.library.path=\"").Append(NativePath);
 			sb.Append("\" -cp \"");
 			foreach (var lib in Libraries)
 			{
 				sb.Append(lib).Append(';');
 			}
 			sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));
-			foreach (var adv in AdvencedArguments)
-			{
-				sb.Append(' ').Append(adv);
-			}
 			return sb.ToString();
 		}
 
