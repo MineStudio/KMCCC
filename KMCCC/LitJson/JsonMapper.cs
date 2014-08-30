@@ -24,6 +24,7 @@ namespace LitJson
         public MemberInfo Info;
         public bool       IsField;
         public Type       Type;
+		public String     Name;
     }
 
 
@@ -173,7 +174,8 @@ namespace LitJson
             if (type.GetInterface ("System.Collections.IList") != null)
                 data.IsList = true;
 
-            foreach (PropertyInfo p_info in type.GetProperties ()) {
+			foreach (PropertyInfo p_info in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+			{
                 if (p_info.Name != "Item")
                     continue;
 
@@ -207,7 +209,8 @@ namespace LitJson
 
             data.Properties = new Dictionary<string, PropertyMetadata> ();
 
-            foreach (PropertyInfo p_info in type.GetProperties ()) {
+			foreach (PropertyInfo p_info in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+			{
                 if (p_info.Name == "Item") {
                     ParameterInfo[] parameters = p_info.GetIndexParameters ();
 
@@ -238,7 +241,8 @@ namespace LitJson
 				}
             }
 
-            foreach (FieldInfo f_info in type.GetFields ()) {
+			foreach (FieldInfo f_info in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+			{
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
                 p_data.IsField = true;
@@ -271,21 +275,43 @@ namespace LitJson
 
             IList<PropertyMetadata> props = new List<PropertyMetadata> ();
 
-            foreach (PropertyInfo p_info in type.GetProperties ()) {
-                if (p_info.Name == "Item")
-                    continue;
+			foreach (PropertyInfo p_info in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+			{
+				if (p_info.Name == "Item")
+				{
+					if (p_info.GetIndexParameters().Length > 0)
+						continue;
+				}
 
-                PropertyMetadata p_data = new PropertyMetadata ();
+				PropertyMetadata p_data = new PropertyMetadata();
                 p_data.Info = p_info;
                 p_data.IsField = false;
+				if (p_info.IsDefined(typeof(JsonPropertyName), true))
+				{
+					var att = (JsonPropertyName)p_info.GetCustomAttributes(typeof(JsonPropertyName), true)[0];
+					p_data.Name = att.Name;
+				}
+				else
+				{
+					p_data.Name = p_info.Name;
+				}
                 props.Add (p_data);
             }
 
-            foreach (FieldInfo f_info in type.GetFields ()) {
+			foreach (FieldInfo f_info in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+			{
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
                 p_data.IsField = true;
-
+				if (f_info.IsDefined(typeof(JsonPropertyName), true))
+				{
+					var att = (JsonPropertyName)f_info.GetCustomAttributes(typeof(JsonPropertyName), true)[0];
+					p_data.Name = att.Name;
+				}
+				else
+				{
+					p_data.Name = f_info.Name;
+				}
                 props.Add (p_data);
             }
 
@@ -821,7 +847,7 @@ namespace LitJson
             writer.WriteObjectStart ();
             foreach (PropertyMetadata p_data in props) {
                 if (p_data.IsField) {
-                    writer.WritePropertyName (p_data.Info.Name);
+                    writer.WritePropertyName (p_data.Name);
                     WriteValue (((FieldInfo) p_data.Info).GetValue (obj),
                                 writer, writer_is_private, depth + 1);
                 }
@@ -829,7 +855,7 @@ namespace LitJson
                     PropertyInfo p_info = (PropertyInfo) p_data.Info;
 
                     if (p_info.CanRead) {
-                        writer.WritePropertyName (p_data.Info.Name);
+                        writer.WritePropertyName (p_data.Name);
                         WriteValue (p_info.GetValue (obj, null),
                                     writer, writer_is_private, depth + 1);
                     }

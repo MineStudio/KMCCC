@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace KMCCC.Tools
 {
+	/// <summary>
+	/// 操蛋的通过反射调用Zip解压
+	/// </summary>
 	public static class ZipTools
 	{
 		static ZipTools()
