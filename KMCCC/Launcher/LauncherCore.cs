@@ -38,7 +38,7 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// JAVA目录
 		/// </summary>
-		public String JavaPath { get; private set; }
+		public String JavaPath { get; set; }
 
 		#region GetVersion
 
@@ -97,6 +97,7 @@ namespace KMCCC.Launcher
 		/// <returns>启动句柄</returns>
 		public LaunchHandle Launch(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{
+			if (!File.Exists(JavaPath)) { return null; }
 			var args = GenerateArguments(options);
 			if (args == null) { return null; }
 			if (argumentsOperators != null)
@@ -140,7 +141,6 @@ namespace KMCCC.Launcher
 			GameRootPath = GameRootPath ?? ".minecraft";
 			JavaPath = JavaPath ?? SystemTools.FindJava();
 			if (!Directory.Exists(GameRootPath)) { return null; }
-			if (!File.Exists(JavaPath)) { return null; }
 			LauncherCoreCreationOption option = new LauncherCoreCreationOption();
 			option.GameRootPath = new DirectoryInfo(GameRootPath).FullName;
 			option.JavaPath = JavaPath;
