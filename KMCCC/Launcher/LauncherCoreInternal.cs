@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using KMCCC.Tools;
@@ -192,5 +193,21 @@ namespace KMCCC.Launcher
 			}
 			return allowed;
 		}
+
+	}
+
+	public static class LaunchHandleExtensions
+	{
+		public static void SetTitle(this LaunchHandle handle, String title)
+		{
+			try
+			{
+				SetWindowText(handle.process.MainWindowHandle, title);
+			}
+			catch { }
+		}
+
+		[DllImport("User32.dll")]
+		public static extern int SetWindowText(IntPtr WinHandle, String Title);
 	}
 }
