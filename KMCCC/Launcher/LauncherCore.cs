@@ -140,7 +140,7 @@ namespace KMCCC.Launcher
 		{
 			GameRootPath = GameRootPath ?? ".minecraft";
 			JavaPath = JavaPath ?? SystemTools.FindJava();
-			if (!Directory.Exists(GameRootPath)) { return null; }
+			if (!Directory.Exists(GameRootPath)) { Directory.CreateDirectory(GameRootPath); }
 			LauncherCoreCreationOption option = new LauncherCoreCreationOption();
 			option.GameRootPath = new DirectoryInfo(GameRootPath).FullName;
 			option.JavaPath = JavaPath;
