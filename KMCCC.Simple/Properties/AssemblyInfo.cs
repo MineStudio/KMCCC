@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("KMCCC.Json")]
+[assembly: AssemblyTitle("KMCCC.Simple")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("KMCCC.Json")]
+[assembly: AssemblyProduct("KMCCC.Simple")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("516dccda-989d-459f-ba4d-bdee44d53846")]
+[assembly: Guid("1a6841c3-c9ee-4e38-a2d8-126f2d4e45c5")]
 
 // 程序集的版本信息由下面四个值组成: 
 //
