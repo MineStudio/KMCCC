@@ -100,9 +100,19 @@ namespace KMCCC.Launcher
 	/// </summary>
 	public static class LauncherCoreItemResolverExtensions
 	{
-		public static String GetJarPath(this LauncherCore core, Version version)
+		public static String GetVersionRootPath(this LauncherCore core, Version version)
+		{
+			return String.Format(@"{0}\versions\{1}\", core.GameRootPath, version.Id);
+		}
+
+		public static String GetVersionJarPath(this LauncherCore core, Version version)
 		{
 			return String.Format(@"{0}\versions\{1}\{1}.jar", core.GameRootPath, version.Id);
+		}
+
+		public static String GetVersionJsonPath(this LauncherCore core, Version version)
+		{
+			return String.Format(@"{0}\versions\{1}\{1}.json", core.GameRootPath, version.Id);
 		}
 
 		public static String GetLibPath(this LauncherCore core, Library lib)

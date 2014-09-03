@@ -48,23 +48,26 @@ namespace KMCCC.Launcher
 		/// <returns>版本数组</returns>
 		public Version[] GetVersions()
 		{
-			try
+			lock (locker)
 			{
-				var directories = new DirectoryInfo(GameRootPath + @"\versions\").EnumerateDirectories();
-				LinkedList<Version> result = new LinkedList<Version>();
-				foreach (var directory in directories)
+				try
 				{
-					var ver = GetVersion(directory.Name);
-					if (ver != null)
+					var directories = new DirectoryInfo(GameRootPath + @"\versions\").EnumerateDirectories();
+					LinkedList<Version> result = new LinkedList<Version>();
+					foreach (var directory in directories)
 					{
-						result.AddFirst(ver);
+						var ver = GetVersion(directory.Name);
+						if (ver != null)
+						{
+							result.AddFirst(ver);
+						}
 					}
+					return result.ToArray();
 				}
-				return result.ToArray();
-			}
-			catch
-			{
-				return new Version[0];
+				catch
+				{
+					return new Version[0];
+				}
 			}
 		}
 
@@ -75,11 +78,14 @@ namespace KMCCC.Launcher
 		/// <returns>指定的版本</returns>
 		public Version GetVersion(String id)
 		{
-			var versionPath = GameRootPath + @"\versions\" + id;
-			if (!Directory.Exists(versionPath)) { return null; }
-			versionPath = versionPath + '\\' + id + ".json";
-			if (!File.Exists(versionPath)) { return null; }
-			return GetVersionInternal(versionPath);
+			lock (locker)
+			{
+				var versionPath = GameRootPath + @"\versions\" + id;
+				if (!Directory.Exists(versionPath)) { return null; }
+				versionPath = versionPath + '\\' + id + ".json";
+				if (!File.Exists(versionPath)) { return null; }
+				return GetVersionInternal(versionPath);
+			}
 		}
 
 		#endregion
@@ -97,20 +103,24 @@ namespace KMCCC.Launcher
 		/// <returns>启动句柄</returns>
 		public LaunchHandle Launch(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{
-			if (!File.Exists(JavaPath)) { return null; }
-			var args = GenerateArguments(options);
-			if (args == null) { return null; }
-			if (argumentsOperators != null)
+			lock (locker)
 			{
-				foreach (var opt in argumentsOperators)
+				if (!File.Exists(JavaPath)) { return null; }
+				currentCode = random.Next();
+				var args = GenerateArguments(options);
+				if (args == null) { return null; }
+				if (argumentsOperators != null)
 				{
-					if (opt != null)
+					foreach (var opt in argumentsOperators)
 					{
-						opt(args);
+						if (opt != null)
+						{
+							opt(args);
+						}
 					}
 				}
+				return this.launch(args);
 			}
-			return this.launch(args);
 		}
 
 		/// <summary>
@@ -122,6 +132,10 @@ namespace KMCCC.Launcher
 		/// 游戏Log事件
 		/// </summary>
 		public event Action<LaunchHandle, String> GameLog;
+
+		internal int currentCode;
+
+		internal Random random = new Random();
 	}
 
 	/// <summary>

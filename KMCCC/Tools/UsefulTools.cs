@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -23,5 +24,23 @@ namespace KMCCC.Tools
 		{
 			return guid.ToString().Replace("-", "");
 		}
+
+		public static void Dircopy(string source, string target)
+		{
+			DirectoryInfo sourceDir = new DirectoryInfo(source);
+			if (!Directory.Exists(target))
+			{
+				Directory.CreateDirectory(target);
+			}
+			foreach (FileInfo file in sourceDir.GetFiles())
+			{
+				File.Copy(file.FullName, target + "\\" + file.Name, true);
+			}
+			foreach (DirectoryInfo subdir in sourceDir.GetDirectories())
+			{
+				Dircopy(subdir.FullName, target + "\\" + subdir.Name);
+			}
+		}
+
 	}
 }
