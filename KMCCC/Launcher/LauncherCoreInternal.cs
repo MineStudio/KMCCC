@@ -16,6 +16,8 @@ namespace KMCCC.Launcher
 	{
 		#region GetVesion
 
+		internal object locker = new object();
+
 		internal Version GetVersionInternal(String jsonPath)
 		{
 			try
@@ -98,7 +100,7 @@ namespace KMCCC.Launcher
 					catch { }
 				}
 				args.Libraries = options.Version.Libraries.Select(lib => this.GetLibPath(lib)).ToList();
-				args.Libraries.Add(this.GetJarPath(options.Version));
+				args.Libraries.Add(this.GetVersionJarPath(options.Version));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
 				args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
@@ -113,6 +115,15 @@ namespace KMCCC.Launcher
 				args.AdvencedArguments = new List<string> { "-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true" };
 				args.authentication = authentication;
 				args.version = options.Version;
+				switch (options.Mode)
+				{
+					case LaunchMode.BMCL:
+						bmclmode(args);
+						break;
+					case LaunchMode.MCLauncher:
+						mcLaunchermode(args);
+						break;
+				}
 				return args;
 			}
 			else
@@ -126,11 +137,12 @@ namespace KMCCC.Launcher
 			try
 			{
 				LaunchHandle handle = new LaunchHandle(args.authentication);
+				handle.code = this.currentCode;
 				handle.core = this;
 				ProcessStartInfo psi = new ProcessStartInfo(this.JavaPath);
 				psi.Arguments = args.ToArguments();
 				psi.UseShellExecute = false;
-				psi.WorkingDirectory = this.GameRootPath;
+				psi.WorkingDirectory = GameRootPath;
 				psi.RedirectStandardError = true;
 				psi.RedirectStandardOutput = true;
 				handle.process = Process.Start(psi);
@@ -150,6 +162,58 @@ namespace KMCCC.Launcher
 			catch (Exception)
 			{
 				return null;
+			}
+		}
+
+		private void bmclmode(MinecraftLaunchArguments args)
+		{
+			operateDirectory("mods", args.version.Id);
+			operateDirectory("coremods", args.version.Id);
+			operateDirectories(this.GetVersionRootPath(args.version));
+		}
+
+		private void mcLaunchermode(MinecraftLaunchArguments args)
+		{
+			args.Tokens["game_directory"] = this.GetVersionRootPath(args.version);
+		}
+
+		private void operateDirectory(String name, String ver)
+		{
+			operateDirectoryInternal(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, name, ver),
+									 String.Format(@"{0}\{1}", GameRootPath, name));
+		}
+
+		private void operateDirectoryInternal(String source, String target)
+		{
+			int code = currentCode;
+			if (Directory.Exists(source))
+			{
+				if (Directory.Exists(target))
+				{
+					Directory.Delete(target, true);
+				}
+				UsefulTools.Dircopy(source, target); Action<LaunchHandle, int> handler = null;
+				handler = (handle, c) =>
+				{
+					if (handle.code == code)
+					{
+						Directory.Delete(source, true);
+						UsefulTools.Dircopy(target, source);
+						Directory.Delete(target, true);
+					}
+					GameExit -= handler;
+				};
+				GameExit += handler;
+			}
+		}
+
+		private void operateDirectories(String ver)
+		{
+			var root = String.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
+			if (!Directory.Exists(root)) { return; }
+			foreach (var dir in new DirectoryInfo(root).EnumerateDirectories())
+			{
+				operateDirectoryInternal(dir.FullName, String.Format(@"{0}\{1}", GameRootPath, dir.Name));
 			}
 		}
 

@@ -34,6 +34,29 @@ namespace KMCCC.Launcher
 		/// 使用的验证器
 		/// </summary>
 		public IAuthenticator Authenticator { get; set; }
+
+		/// <summary>
+		/// 启动模式
+		/// </summary>
+		public LaunchMode Mode { get; set; }
+	}
+	/// <summary>
+	/// 启动模式
+	/// </summary>
+	public enum LaunchMode
+	{
+		/// <summary>
+		/// 没有认为附加选项（默认）
+		/// </summary>
+		Own,
+		/// <summary>
+		/// BMCL的启动特点，主目录在{GameRootPath}/
+		/// </summary>
+		BMCL, 
+		/// <summary>
+		/// MCLauncher的启动特点，主目录在{GameRootPath}/versions/{version}/
+		/// </summary>
+		MCLauncher
 	}
 
 	/// <summary>
@@ -45,6 +68,8 @@ namespace KMCCC.Launcher
 		/// 只读的验证信息
 		/// </summary>
 		public readonly AuthenticationInfo info;
+
+		internal int code;
 
 		internal LauncherCore core;
 
