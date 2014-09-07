@@ -121,7 +121,7 @@ namespace KMCCC.Launcher
 						bmclmode(args);
 						break;
 					case LaunchMode.MCLauncher:
-
+						mcLaunchermode(args);
 						break;
 				}
 				return args;
@@ -142,7 +142,7 @@ namespace KMCCC.Launcher
 				ProcessStartInfo psi = new ProcessStartInfo(this.JavaPath);
 				psi.Arguments = args.ToArguments();
 				psi.UseShellExecute = false;
-				psi.WorkingDirectory = this.GameRootPath;
+				psi.WorkingDirectory = GameRootPath;
 				psi.RedirectStandardError = true;
 				psi.RedirectStandardOutput = true;
 				handle.process = Process.Start(psi);
@@ -172,6 +172,11 @@ namespace KMCCC.Launcher
 			operateDirectories(this.GetVersionRootPath(args.version));
 		}
 
+		private void mcLaunchermode(MinecraftLaunchArguments args)
+		{
+			args.Tokens["game_directory"] = this.GetVersionRootPath(args.version);
+		}
+
 		private void operateDirectory(String name, String ver)
 		{
 			operateDirectoryInternal(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, name, ver),
@@ -187,8 +192,8 @@ namespace KMCCC.Launcher
 				{
 					Directory.Delete(target, true);
 				}
-				UsefulTools.Dircopy(source, target);
-				GameExit += (handle, c) =>
+				UsefulTools.Dircopy(source, target); Action<LaunchHandle, int> handler = null;
+				handler = (handle, c) =>
 				{
 					if (handle.code == code)
 					{
@@ -196,7 +201,9 @@ namespace KMCCC.Launcher
 						UsefulTools.Dircopy(target, source);
 						Directory.Delete(target, true);
 					}
+					GameExit -= handler;
 				};
+				GameExit += handler;
 			}
 		}
 
