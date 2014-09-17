@@ -153,8 +153,6 @@ namespace KMCCC.Launcher
 				}).ContinueWith(t =>
 					{
 						Directory.Delete(args.NativePath, true);
-						handle._thError.Abort();
-						handle._thOutput.Abort();
 						this.exit(handle, handle.process.ExitCode);
 					});
 				return handle;

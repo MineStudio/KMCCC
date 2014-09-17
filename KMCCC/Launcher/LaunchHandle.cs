@@ -80,66 +80,30 @@ namespace KMCCC.Launcher
 			this.info = info;
 		}
 
-		internal StreamReader _gameoutput;
-		internal StreamReader _gameerror;
-
-		internal Thread _thOutput;
-		internal Thread _thError;
-
-		internal void Logger()
+		private void output(object sender, DataReceivedEventArgs e)
 		{
-			_gameoutput = process.StandardOutput;
-			_gameerror = process.StandardError;
-			_thOutput = new Thread(new ThreadStart(delegate
+			if (e.Data == null) { process.OutputDataReceived -= output; }
+			else
 			{
-				while (true)
-				{
-					try
-					{
-						if (!_gameoutput.EndOfStream)
-						{
-							string line = _gameoutput.ReadLine();
-							core.log(this, line);
-						}
-					}
-					catch (Exception ex)
-					{
-						string line = ex.StackTrace;
-						core.log(this, line);
-					}
-				}
-				// ReSharper disable once FunctionNeverReturns
-			}));
-			_thError = new Thread(new ThreadStart(delegate
-			{
-				while (true)
-				{
-					try
-					{
-						if (!_gameerror.EndOfStream)
-						{
-							string line = _gameerror.ReadLine();
-							core.log(this, line);
-						}
-					}
-					catch (Exception ex)
-					{
-						string line = ex.StackTrace;
-						core.log(this, line);
-					}
-				}
-				// ReSharper disable once FunctionNeverReturns
-			}));
-			_thOutput.IsBackground = true;
-			_thError.IsBackground = true;
-			_thOutput.Start();
-			_thError.Start();
+				core.log(this, e.Data);
+			}
+		}
 
+		private void error(object sender, DataReceivedEventArgs e)
+		{
+			if (e.Data == null) { process.OutputDataReceived -= error; }
+			else
+			{
+				core.log(this, e.Data);
+			}
 		}
 
 		internal void work()
 		{
-			Logger();
+			process.BeginOutputReadLine();
+			process.OutputDataReceived += output;
+			process.BeginErrorReadLine();
+			process.ErrorDataReceived += error;
 		}
 	}
 
