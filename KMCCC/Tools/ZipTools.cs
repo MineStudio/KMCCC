@@ -21,8 +21,7 @@ namespace KMCCC.Tools
 		{
 			try
 			{
-				Package F__kingLink = null;
-				var windowsBase = AppDomain.CurrentDomain.GetAssemblies().Single(item => item.FullName.StartsWith("WindowsBase,"));
+				var windowsBase = typeof(System.IO.Packaging.Package).Assembly;
 				ZipArchive = windowsBase.GetType("MS.Internal.IO.Zip.ZipArchive");
 				ZipArchive_OpenOnFile = ZipArchive.GetMethod("OpenOnFile", BindingFlags.NonPublic | BindingFlags.Static);
 				ZipArchive_GetFiles = ZipArchive.GetMethod("GetFiles", BindingFlags.NonPublic | BindingFlags.Instance);
