@@ -29,6 +29,7 @@ namespace KMCCC.Tools
 				ZipFileInfo = windowsBase.GetType("MS.Internal.IO.Zip.ZipFileInfo");
 				ZipFileInfo_GetStream = ZipFileInfo.GetMethod("GetStream", BindingFlags.NonPublic | BindingFlags.Instance);
 				ZipFileInfo_Name = ZipFileInfo.GetProperty("Name", BindingFlags.NonPublic | BindingFlags.Instance);
+				ZipFileInfo_FolderFlag = ZipFileInfo.GetProperty("FolderFlag", BindingFlags.NonPublic | BindingFlags.Instance);
 				Enabled = true;
 			}
 			catch { Enabled = false; }
@@ -48,6 +49,8 @@ namespace KMCCC.Tools
 
 		public static readonly PropertyInfo ZipFileInfo_Name;
 
+		public static readonly PropertyInfo ZipFileInfo_FolderFlag;
+
 		public static bool Unzip(String zipFile, String outputDirectory, UnzipOptions options)
 		{
 			if (options == null) { return false; }
@@ -55,6 +58,7 @@ namespace KMCCC.Tools
 			{
 				var root = new DirectoryInfo(outputDirectory);
 				root.Create();
+				var rootPath = root.FullName + "/";
 				var zip = ZipArchive_OpenOnFile.Invoke(null, new object[] { zipFile, FileMode.Open, FileAccess.Read, FileShare.Read, false });
 				IEnumerable files = (IEnumerable)ZipArchive_GetFiles.Invoke(zip, new object[] { });
 				IEnumerable<String> exclude = (options.Exclude == null ? new List<String>() : options.Exclude);
@@ -66,11 +70,16 @@ namespace KMCCC.Tools
 					{
 						continue;
 					}
+					if ((bool)ZipFileInfo_FolderFlag.GetValue(item, null))
+					{
+						Directory.CreateDirectory(rootPath + name);
+						continue;
+					}
 					using (Stream stream = (Stream)ZipFileInfo_GetStream.Invoke(item, new object[] { FileMode.Open, FileAccess.Read }))
 					{
-						String filePath = root.FullName + "/" + name;
+						String filePath = rootPath + name;
 						new FileInfo(filePath).Directory.Create();
-						using (var fs = File.OpenWrite(filePath))
+						using (var fs = new FileStream(filePath, FileMode.Truncate))
 						{
 							stream.CopyTo(fs);
 						}
