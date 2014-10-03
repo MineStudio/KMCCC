@@ -79,7 +79,7 @@ namespace KMCCC.Tools
 					{
 						String filePath = rootPath + name;
 						new FileInfo(filePath).Directory.Create();
-						using (var fs = new FileStream(filePath, FileMode.Truncate))
+						using (var fs = new FileStream(filePath, FileMode.Create))
 						{
 							stream.CopyTo(fs);
 						}
