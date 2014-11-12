@@ -59,7 +59,7 @@ namespace KMCCC.Launcher
 							NS = names[0],
 							Name = names[1],
 							Version = names[2],
-							NativeSuffix = lib.Natives["windows"].Replace("{arch}", SystemTools.GetArch())
+							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch())
 						};
 						ver.Natives.Add(native);
 						if (lib.Extract != null)
@@ -172,7 +172,7 @@ namespace KMCCC.Launcher
 
 		private void mcLaunchermode(MinecraftLaunchArguments args)
 		{
-			args.Tokens["game_directory"] = this.GetVersionRootPath(args.version);
+			args.Tokens["game_directory"] = String.Format(@".\versions\{0}\", args.version.Id);
 		}
 
 		private void operateDirectory(String name, String ver)
