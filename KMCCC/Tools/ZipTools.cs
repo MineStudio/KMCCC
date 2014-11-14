@@ -25,6 +25,7 @@ namespace KMCCC.Tools
 				ZipArchive = windowsBase.GetType("MS.Internal.IO.Zip.ZipArchive");
 				ZipArchive_OpenOnFile = ZipArchive.GetMethod("OpenOnFile", BindingFlags.NonPublic | BindingFlags.Static);
 				ZipArchive_GetFiles = ZipArchive.GetMethod("GetFiles", BindingFlags.NonPublic | BindingFlags.Instance);
+				ZipArchive_Close = ZipArchive.GetMethod("Close", BindingFlags.NonPublic | BindingFlags.Instance);
 
 				ZipFileInfo = windowsBase.GetType("MS.Internal.IO.Zip.ZipFileInfo");
 				ZipFileInfo_GetStream = ZipFileInfo.GetMethod("GetStream", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -42,6 +43,8 @@ namespace KMCCC.Tools
 		public static readonly MethodInfo ZipArchive_OpenOnFile;
 
 		public static readonly MethodInfo ZipArchive_GetFiles;
+
+		public static readonly MethodInfo ZipArchive_Close;
 
 		public static readonly Type ZipFileInfo;
 
@@ -85,6 +88,7 @@ namespace KMCCC.Tools
 						}
 					}
 				}
+				ZipArchive_Close.Invoke(zip, new object[] { });
 				return true;
 			}
 			catch

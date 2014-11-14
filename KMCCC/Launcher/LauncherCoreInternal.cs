@@ -103,6 +103,7 @@ namespace KMCCC.Launcher
 				args.Libraries.Add(this.GetVersionJarPath(options.Version));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
 				args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
+				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
 				args.Tokens.Add("version_name", options.Version.Id);
 				args.Tokens.Add("game_directory", ".");

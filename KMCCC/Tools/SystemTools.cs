@@ -9,7 +9,7 @@ using Microsoft.VisualBasic.Devices;
 
 namespace KMCCC.Tools
 {
-	class SystemTools
+	public class SystemTools
 	{
 		/// <summary>
 		/// 找JAVA
