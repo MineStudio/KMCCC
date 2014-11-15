@@ -39,6 +39,11 @@ namespace KMCCC.Launcher
 		/// 启动模式
 		/// </summary>
 		public LaunchMode Mode { get; set; }
+
+		/// <summary>
+		/// 直接连接的服务器
+		/// </summary>
+		public ServerInfo Server { get; set; }
 	}
 	/// <summary>
 	/// 启动模式

@@ -65,6 +65,11 @@ namespace KMCCC.Launcher
 		public Dictionary<String, String> Tokens { get; set; }
 
 		/// <summary>
+		/// 启动后直接连接到服务器
+		/// </summary>
+		public ServerInfo Server { get; set; }
+
+		/// <summary>
 		/// 附加参数
 		/// </summary>
 		public List<String> AdvencedArguments { get; set; }
@@ -94,11 +99,33 @@ namespace KMCCC.Launcher
 				sb.Append(lib).Append(';');
 			}
 			sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));
+			if (this.Server != null)
+			{
+				if (!String.IsNullOrWhiteSpace(this.Server.Address))
+				{
+					sb.Append(" --server " + this.Server.Address);
+					if (this.Server.Port==0)
+					{
+						sb.Append(" --port 25565");
+					}
+					else
+					{
+						sb.Append(" --port " + this.Server.Port.ToString());
+					}
+				}
+			}
 			return sb.ToString();
 		}
 
 		internal AuthenticationInfo authentication;
 		internal Version version;
+	}
+
+	public class ServerInfo
+	{
+		public string Address { get; set; }
+
+		public ushort Port { get; set; }
 	}
 
 }

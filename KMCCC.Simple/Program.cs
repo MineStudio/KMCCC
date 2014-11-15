@@ -36,6 +36,8 @@ namespace KMCCC.Simple
 						Version = core.GetVersion("****"),
 						Authenticator = new OfflineAuthenticator("KBlackcn"),
 						//Authenticator = new YggdrasilLogin("****@****", "****", true),
+						Server = new ServerInfo { Address = "mc.hypixel.net" },
+						Mode = LaunchMode.BMCL,
 						MaxMemory = 2048,
 						MinMemory = 1024
 					});

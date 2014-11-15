@@ -99,6 +99,7 @@ namespace KMCCC.Launcher
 					}
 					catch { }
 				}
+				args.Server = options.Server;
 				args.Libraries = options.Version.Libraries.Select(lib => this.GetLibPath(lib)).ToList();
 				args.Libraries.Add(this.GetVersionJarPath(options.Version));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
