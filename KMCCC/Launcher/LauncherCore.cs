@@ -33,12 +33,12 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// 游戏根目录
 		/// </summary>
-		public String GameRootPath { get; private set; }
+		public string GameRootPath { get; private set; }
 
 		/// <summary>
 		/// JAVA目录
 		/// </summary>
-		public String JavaPath { get; set; }
+		public string JavaPath { get; set; }
 
 		#region GetVersion
 
@@ -76,7 +76,7 @@ namespace KMCCC.Launcher
 		/// </summary>
 		/// <param name="id">要指定的ID</param>
 		/// <returns>指定的版本</returns>
-		public Version GetVersion(String id)
+		public Version GetVersion(string id)
 		{
 			lock (locker)
 			{
@@ -131,7 +131,7 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// 游戏Log事件
 		/// </summary>
-		public event Action<LaunchHandle, String> GameLog;
+		public event Action<LaunchHandle, string> GameLog;
 
 		internal int currentCode;
 
@@ -150,7 +150,7 @@ namespace KMCCC.Launcher
 		/// <param name="GameRootPath">游戏根目录</param>
 		/// <param name="JavaPath">JAVA目录</param>
 		/// <returns></returns>
-		public static LauncherCoreCreationOption Create(String GameRootPath = null, String JavaPath = null)
+		public static LauncherCoreCreationOption Create(string GameRootPath = null, string JavaPath = null)
 		{
 			GameRootPath = GameRootPath ?? ".minecraft";
 			JavaPath = JavaPath ?? SystemTools.FindJava();
@@ -164,11 +164,11 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// 游戏根目录
 		/// </summary>
-		public String GameRootPath { get; internal set; }
+		public string GameRootPath { get; internal set; }
 
 		/// <summary>
 		/// JAVA地址
 		/// </summary>
-		public String JavaPath { get; internal set; }
+		public string JavaPath { get; internal set; }
 	}
 }

@@ -18,7 +18,7 @@ namespace KMCCC.Launcher
 
 		internal object locker = new object();
 
-		internal Version GetVersionInternal(String jsonPath)
+		internal Version GetVersionInternal(string jsonPath)
 		{
 			try
 			{
@@ -100,6 +100,7 @@ namespace KMCCC.Launcher
 					catch { }
 				}
 				args.Server = options.Server;
+				args.Size = options.Size;
 				args.Libraries = options.Version.Libraries.Select(lib => this.GetLibPath(lib)).ToList();
 				args.Libraries.Add(this.GetVersionJarPath(options.Version));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
@@ -177,13 +178,13 @@ namespace KMCCC.Launcher
 			args.Tokens["game_directory"] = String.Format(@".\versions\{0}\", args.version.Id);
 		}
 
-		private void operateDirectory(String name, String ver)
+		private void operateDirectory(string name, string ver)
 		{
 			operateDirectoryInternal(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, name, ver),
 									 String.Format(@"{0}\{1}", GameRootPath, name));
 		}
 
-		private void operateDirectoryInternal(String source, String target)
+		private void operateDirectoryInternal(string source, string target)
 		{
 			int code = currentCode;
 			if (Directory.Exists(source))
@@ -207,7 +208,7 @@ namespace KMCCC.Launcher
 			}
 		}
 
-		private void operateDirectories(String ver)
+		private void operateDirectories(string ver)
 		{
 			var root = String.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
 			if (!Directory.Exists(root)) { return; }
@@ -217,7 +218,7 @@ namespace KMCCC.Launcher
 			}
 		}
 
-		internal void log(LaunchHandle handle, String line)
+		internal void log(LaunchHandle handle, string line)
 		{
 			if (GameLog != null)
 			{
@@ -262,7 +263,7 @@ namespace KMCCC.Launcher
 
 	public static class LaunchHandleExtensions
 	{
-		public static void SetTitle(this LaunchHandle handle, String title)
+		public static void SetTitle(this LaunchHandle handle, string title)
 		{
 			try
 			{
@@ -272,6 +273,6 @@ namespace KMCCC.Launcher
 		}
 
 		[DllImport("User32.dll")]
-		public static extern int SetWindowText(IntPtr WinHandle, String Title);
+		public static extern int SetWindowText(IntPtr WinHandle, string Title);
 	}
 }

@@ -11,7 +11,7 @@ namespace KMCCC.Tools
 	/// </summary>
 	public static class UsefulTools
 	{
-		public static String DoReplace(this String source, IDictionary<String, String> dic)
+		public static string DoReplace(this string source, IDictionary<string, string> dic)
 		{
 			foreach (var pair in dic)
 			{
@@ -20,7 +20,7 @@ namespace KMCCC.Tools
 			return source;
 		}
 
-		public static String GoString(this Guid guid)
+		public static string GoString(this Guid guid)
 		{
 			return guid.ToString().Replace("-", "");
 		}

@@ -14,6 +14,7 @@ namespace KMCCC.Tools
 {
 	/// <summary>
 	/// 操蛋的通过反射调用Zip解压
+	/// Notice: 文件名只支持ASCII
 	/// </summary>
 	public static class ZipTools
 	{
@@ -54,7 +55,7 @@ namespace KMCCC.Tools
 
 		public static readonly PropertyInfo ZipFileInfo_FolderFlag;
 
-		public static bool Unzip(String zipFile, String outputDirectory, UnzipOptions options)
+		public static bool Unzip(string zipFile, string outputDirectory, UnzipOptions options)
 		{
 			if (options == null) { return false; }
 			try
@@ -64,11 +65,11 @@ namespace KMCCC.Tools
 				var rootPath = root.FullName + "/";
 				var zip = ZipArchive_OpenOnFile.Invoke(null, new object[] { zipFile, FileMode.Open, FileAccess.Read, FileShare.Read, false });
 				IEnumerable files = (IEnumerable)ZipArchive_GetFiles.Invoke(zip, new object[] { });
-				IEnumerable<String> exclude = (options.Exclude == null ? new List<String>() : options.Exclude);
+				IEnumerable<string> exclude = (options.Exclude == null ? new List<string>() : options.Exclude);
 				if (exclude.Count() > 1000) { exclude = exclude.AsParallel(); }
 				foreach (var item in files)
 				{
-					String name = (String)ZipFileInfo_Name.GetValue(item, null);
+					string name = (string)ZipFileInfo_Name.GetValue(item, null);
 					if (exclude.Any(ex => name.StartsWith(ex)))
 					{
 						continue;
@@ -80,7 +81,7 @@ namespace KMCCC.Tools
 					}
 					using (Stream stream = (Stream)ZipFileInfo_GetStream.Invoke(item, new object[] { FileMode.Open, FileAccess.Read }))
 					{
-						String filePath = rootPath + name;
+						string filePath = rootPath + name;
 						new FileInfo(filePath).Directory.Create();
 						using (var fs = new FileStream(filePath, FileMode.Create))
 						{
@@ -113,7 +114,7 @@ namespace KMCCC.Tools
 
 	public class UnzipOptions
 	{
-		public List<String> Exclude { get; set; }
+		public List<string> Exclude { get; set; }
 	}
 
 }

@@ -12,7 +12,7 @@ namespace KMCCC.Version
 	public class JVersion
 	{
 		[JsonPropertyName("id")]
-		public String Id { get; set; }
+		public string Id { get; set; }
 
 		[JsonPropertyName("time")]
 		public DateTime Time { get; set; }
@@ -21,31 +21,31 @@ namespace KMCCC.Version
 		public DateTime ReleaseTime { get; set; }
 
 		[JsonPropertyName("type")]
-		public String Type { get; set; }
+		public string Type { get; set; }
 
 		[JsonPropertyName("minecraftArguments")]
-		public String MinecraftArguments { get; set; }
+		public string MinecraftArguments { get; set; }
 
 		[JsonPropertyName("minimumLauncherVersion")]
-		public Int32 MinimumLauncherVersion { get; set; }
+		public int MinimumLauncherVersion { get; set; }
 
 		[JsonPropertyName("libraries")]
 		public List<JLibrary> Libraries { get; set; }
 
 		[JsonPropertyName("mainClass")]
-		public String MainClass { get; set; }
+		public string MainClass { get; set; }
 
 		[JsonPropertyName("assets")]
-		public String Assets { get; set; }
+		public string Assets { get; set; }
 	}
 
 	public class JLibrary
 	{
 		[JsonPropertyName("name")]
-		public String Name { get; set; }
+		public string Name { get; set; }
 
 		[JsonPropertyName("natives")]
-		public Dictionary<String, String> Natives { get; set; }
+		public Dictionary<string, string> Natives { get; set; }
 
 		[JsonPropertyName("rules")]
 		public List<JRule> Rules { get; set; }
@@ -57,7 +57,7 @@ namespace KMCCC.Version
 	public class JRule
 	{
 		[JsonPropertyName("action")]
-		public String Action { get; set; }
+		public string Action { get; set; }
 
 		[JsonPropertyName("os")]
 		public JOS OS { get; set; }
@@ -66,12 +66,12 @@ namespace KMCCC.Version
 	public class JOS
 	{
 		[JsonPropertyName("name")]
-		public String Name { get; set; }
+		public string Name { get; set; }
 	}
 
 	public class JExtract
 	{
 		[JsonPropertyName("exclude")]
-		public List<String> Exculde { get; set; }
+		public List<string> Exculde { get; set; }
 	}
 }

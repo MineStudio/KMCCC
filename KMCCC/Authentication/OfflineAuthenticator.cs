@@ -14,13 +14,13 @@ namespace KMCCC.Authentication
 		/// <summary>
 		/// 玩家的名字
 		/// </summary>
-		public readonly String DisplayName;
+		public readonly string DisplayName;
 
 		/// <summary>
 		/// 构造离线验证器
 		/// </summary>
 		/// <param name="displayName">玩家的名字</param>
-		public OfflineAuthenticator(String displayName)
+		public OfflineAuthenticator(string displayName)
 		{
 			this.DisplayName = displayName;
 		}

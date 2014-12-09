@@ -13,7 +13,7 @@ namespace KMCCC.Authentication
 		/// <summary>
 		/// 玩家的名字
 		/// </summary>
-		public String DisplayName { get; set; }
+		public string DisplayName { get; set; }
 
 		/// <summary>
 		/// UUID不解释
@@ -28,21 +28,21 @@ namespace KMCCC.Authentication
 		/// <summary>
 		/// 各种属性（比如Twitch的Session）
 		/// </summary>
-		public String Properties { get; set; }
+		public string Properties { get; set; }
 
 		/// <summary>
 		/// 错误信息，无错误则为null
 		/// </summary>
-		public String Error { get; set; }
+		public string Error { get; set; }
 
 		/// <summary>
 		/// 用户类型：Legacy or Mojang
 		/// </summary>
-		public String UserType { get; set; }
+		public string UserType { get; set; }
 
 		/// <summary>
 		/// 其他验证信息，一边用不着
 		/// </summary>
-		public Dictionary<String, String> AdvancedInfo { get; set; }
+		public Dictionary<string, string> AdvancedInfo { get; set; }
 	}
 }

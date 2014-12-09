@@ -18,12 +18,12 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// 最大内存
 		/// </summary>
-		public Int32 MaxMemory { get; set; }
+		public int MaxMemory { get; set; }
 
 		/// <summary>
 		/// 最小内存
 		/// </summary>
-		public Int32 MinMemory { get; set; }
+		public int MinMemory { get; set; }
 
 		/// <summary>
 		/// 启动的版本
@@ -44,6 +44,11 @@ namespace KMCCC.Launcher
 		/// 直接连接的服务器
 		/// </summary>
 		public ServerInfo Server { get; set; }
+
+		/// <summary>
+		/// 设置窗口大小
+		/// </summary>
+		public WindowSize Size { get; set; }
 	}
 	/// <summary>
 	/// 启动模式
@@ -127,14 +132,14 @@ namespace KMCCC.Launcher
 		/// </summary>
 		/// <param name="type">异常类型</param>
 		/// <param name="message">异常信息</param>
-		public LaunchException(LaunchExceptionType type, String message) : base(message) { this.Type = type; }
+		public LaunchException(LaunchExceptionType type, string message) : base(message) { this.Type = type; }
 		/// <summary>
 		/// 启动异常
 		/// </summary>
 		/// <param name="type">异常类型</param>
 		/// <param name="message">异常信息</param>
 		/// <param name="innerException">内部异常</param>
-		public LaunchException(LaunchExceptionType type, String message, Exception innerException) : base(message, innerException) { this.Type = type; }
+		public LaunchException(LaunchExceptionType type, string message, Exception innerException) : base(message, innerException) { this.Type = type; }
 	}
 
 	/// <summary>

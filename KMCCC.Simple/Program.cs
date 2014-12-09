@@ -40,6 +40,7 @@ namespace KMCCC.Simple
 						Mode = LaunchMode.BMCL,
 						MaxMemory = 2048,
 						MinMemory = 1024
+						Size = new WindowSize { Height = 768, Width = 1280 }
 					});
 					are.WaitOne();
 				}
@@ -48,6 +49,7 @@ namespace KMCCC.Simple
 
 		static void core_GameLog(LaunchHandle handle, string line)
 		{
+			Console.WriteLine(line);
 			tw.WriteLine(line);
 		}
 

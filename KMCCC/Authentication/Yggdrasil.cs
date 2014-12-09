@@ -15,17 +15,17 @@ namespace KMCCC.Authentication
 		/// <summary>
 		/// 电子邮件地址
 		/// </summary>
-		public String Email { get; private set; }
+		public string Email { get; private set; }
 
 		/// <summary>
 		/// 密码
 		/// </summary>
-		public String Password { get; private set; }
+		public string Password { get; private set; }
 
 		/// <summary>
 		/// 是否启用Twitch
 		/// </summary>
-		public Boolean TwitchEnabled { get; private set; }
+		public bool TwitchEnabled { get; private set; }
 
 		/// <summary>
 		/// 新建正版验证器
@@ -33,7 +33,7 @@ namespace KMCCC.Authentication
 		/// <param name="email">电子邮件地址</param>
 		/// <param name="password">密码</param>
 		/// <param name="twitchEnabled">是否启用Twitch</param>
-		public YggdrasilLogin(String email, String password, Boolean twitchEnabled)
+		public YggdrasilLogin(string email, string password, bool twitchEnabled)
 		{
 			this.Email = email;
 			this.Password = password;

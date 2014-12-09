@@ -20,49 +20,49 @@ namespace KMCCC.Launcher
 		public MinecraftLaunchArguments()
 		{
 			CGCEnabled = true;
-			Tokens = new Dictionary<String, String>();
-			AdvencedArguments = new List<String>();
+			Tokens = new Dictionary<string, string>();
+			AdvencedArguments = new List<string>();
 		}
 
 		/// <summary>
 		/// 主类
 		/// </summary>
-		public String MainClass { get; set; }
+		public string MainClass { get; set; }
 
 		/// <summary>
 		/// 库文件列表（推荐绝对路径）
 		/// </summary>
-		public List<String> Libraries { get; set; }
+		public List<string> Libraries { get; set; }
 
 		/// <summary>
 		/// 最大内存
 		/// </summary>
-		public Int32 MaxMemory { get; set; }
+		public int MaxMemory { get; set; }
 
 		/// <summary>
 		/// 最小内存，推荐不设置
 		/// </summary>
-		public Int32 MinMemory { get; set; }
+		public int MinMemory { get; set; }
 
 		/// <summary>
 		/// 默认true，不要作死去设置成false
 		/// </summary>
-		public Boolean CGCEnabled { get; set; }
+		public bool CGCEnabled { get; set; }
 
 		/// <summary>
 		/// 本地dll文件地址
 		/// </summary>
-		public String NativePath { get; set; }
+		public string NativePath { get; set; }
 
 		/// <summary>
 		/// MC主参数（将由Token进行替换操作）
 		/// </summary>
-		public String MinecraftArguments { get; set; }
+		public string MinecraftArguments { get; set; }
 
 		/// <summary>
 		/// 对MC主参数要进行的替换操作表
 		/// </summary>
-		public Dictionary<String, String> Tokens { get; set; }
+		public Dictionary<string, string> Tokens { get; set; }
 
 		/// <summary>
 		/// 启动后直接连接到服务器
@@ -70,15 +70,20 @@ namespace KMCCC.Launcher
 		public ServerInfo Server { get; set; }
 
 		/// <summary>
+		/// 启动后的窗口大小设置
+		/// </summary>
+		public WindowSize Size { get; set; }
+
+		/// <summary>
 		/// 附加参数
 		/// </summary>
-		public List<String> AdvencedArguments { get; set; }
+		public List<string> AdvencedArguments { get; set; }
 
 		/// <summary>
 		/// 转化为String参数
 		/// </summary>
 		/// <returns>转化后的参数</returns>
-		public String ToArguments()
+		public string ToArguments()
 		{
 			StringBuilder sb = new StringBuilder();
 			if (CGCEnabled) { sb.Append("-Xincgc"); }
@@ -114,6 +119,23 @@ namespace KMCCC.Launcher
 					}
 				}
 			}
+			if (this.Size != null)
+			{
+				if (this.Size.FullScreen == true)
+				{
+					sb.Append(" --fullscreen");
+				}
+				if (this.Size.Height != null)
+				{
+					ushort height = (ushort)this.Size.Height;
+					if (height > 0) { sb.Append(String.Format(" --height {0}", height)); }
+				}
+				if (this.Size.Width != null)
+				{
+					ushort width = (ushort)this.Size.Width;
+					if (width > 0) { sb.Append(String.Format(" --width {0}", width)); }
+				}
+			}
 			return sb.ToString();
 		}
 
@@ -126,6 +148,15 @@ namespace KMCCC.Launcher
 		public string Address { get; set; }
 
 		public ushort Port { get; set; }
+	}
+
+	public class WindowSize
+	{
+		public bool? FullScreen { get; set; }
+
+		public ushort? Height { get; set; }
+
+		public ushort? Width { get; set; }
 	}
 
 }

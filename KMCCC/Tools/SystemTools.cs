@@ -15,7 +15,7 @@ namespace KMCCC.Tools
 		/// 找JAVA
 		/// </summary>
 		/// <returns>JAVA地址</returns>
-		public static String FindJava()
+		public static string FindJava()
 		{
 			try
 			{
@@ -51,7 +51,7 @@ namespace KMCCC.Tools
 		/// 取最大内存
 		/// </summary>
 		/// <returns>最大内存</returns>
-		public static UInt64 GetTotalMemory()
+		public static ulong GetTotalMemory()
 		{
 			return new Computer().Info.TotalPhysicalMemory;
 		}
@@ -60,7 +60,7 @@ namespace KMCCC.Tools
 		/// 获取x86 or x64
 		/// </summary>
 		/// <returns>32 or 64</returns>
-		public static String GetArch()
+		public static string GetArch()
 		{
 			return Environment.Is64BitOperatingSystem ? "64" : "32";
 		}

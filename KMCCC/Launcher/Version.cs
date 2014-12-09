@@ -15,22 +15,22 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// ID
 		/// </summary>
-		public String Id { get; set; }
+		public string Id { get; set; }
 
 		/// <summary>
 		/// 主启动参数
 		/// </summary>
-		public String MinecraftArguments { get; set; }
+		public string MinecraftArguments { get; set; }
 
 		/// <summary>
 		/// 资源名
 		/// </summary>
-		public String Assets { get; set; }
+		public string Assets { get; set; }
 
 		/// <summary>
 		/// 主类
 		/// </summary>
-		public String MainClass { get; set; }
+		public string MainClass { get; set; }
 
 		/// <summary>
 		/// 库列表
@@ -51,17 +51,17 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// NS
 		/// </summary>
-		public String NS { get; set; }
+		public string NS { get; set; }
 
 		/// <summary>
 		/// Name
 		/// </summary>
-		public String Name { get; set; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// Version
 		/// </summary>
-		public String Version { get; set; }
+		public string Version { get; set; }
 	}
 
 	/// <summary>
@@ -72,22 +72,22 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// NS
 		/// </summary>
-		public String NS { get; set; }
+		public string NS { get; set; }
 
 		/// <summary>
 		/// Name
 		/// </summary>
-		public String Name { get; set; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// Version
 		/// </summary>
-		public String Version { get; set; }
+		public string Version { get; set; }
 
 		/// <summary>
 		/// 本机实现后缀
 		/// </summary>
-		public String NativeSuffix { get; set; }
+		public string NativeSuffix { get; set; }
 
 		/// <summary>
 		/// 解压参数
@@ -100,27 +100,27 @@ namespace KMCCC.Launcher
 	/// </summary>
 	public static class LauncherCoreItemResolverExtensions
 	{
-		public static String GetVersionRootPath(this LauncherCore core, Version version)
+		public static string GetVersionRootPath(this LauncherCore core, Version version)
 		{
 			return String.Format(@"{0}\versions\{1}\", core.GameRootPath, version.Id);
 		}
 
-		public static String GetVersionJarPath(this LauncherCore core, Version version)
+		public static string GetVersionJarPath(this LauncherCore core, Version version)
 		{
 			return String.Format(@"{0}\versions\{1}\{1}.jar", core.GameRootPath, version.Id);
 		}
 
-		public static String GetVersionJsonPath(this LauncherCore core, Version version)
+		public static string GetVersionJsonPath(this LauncherCore core, Version version)
 		{
 			return String.Format(@"{0}\versions\{1}\{1}.json", core.GameRootPath, version.Id);
 		}
 
-		public static String GetLibPath(this LauncherCore core, Library lib)
+		public static string GetLibPath(this LauncherCore core, Library lib)
 		{
 			return String.Format(@"{0}\libraries\{1}\{2}\{3}\{2}-{3}.jar", core.GameRootPath, lib.NS.Replace(".", "\\"), lib.Name, lib.Version);
 		}
 
-		public static String GetNativePath(this LauncherCore core, Native native)
+		public static string GetNativePath(this LauncherCore core, Native native)
 		{
 			return String.Format(@"{0}\libraries\{1}\{2}\{3}\{2}-{3}-{4}.jar", core.GameRootPath, native.NS.Replace(".", "\\"), native.Name, native.Version, native.NativeSuffix);
 		}

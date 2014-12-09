@@ -13,9 +13,10 @@ namespace KMCCC.Yggdrasil
 	/// </summary>
 	public class YggdrasilClient
 	{
-		public const String MojnagAuthServer = @"https://authserver.mojang.com";
+		public const string MojnagAuthServer = @"https://authserver.mojang.com";
 
-		public const String Auth_Authentication = @"https://authserver.mojang.com/authenticate";
+		public const string Auth_Authentication = @"https://authserver.mojang.com/authenticate";
+
 		public YggdrasilClient() : this(Guid.NewGuid()) { }
 
 		public YggdrasilClient(Guid ClientToken)
@@ -29,15 +30,15 @@ namespace KMCCC.Yggdrasil
 
 		public Guid UUID { get; private set; }
 
-		public String DisplayName { get; private set; }
+		public string DisplayName { get; private set; }
 
-		public String Properties { get; private set; }
+		public string Properties { get; private set; }
 
-		public String AccountType { get; private set; }
+		public string AccountType { get; private set; }
 
 		private object locker = new object();
 
-		public bool Authenticate(String Email, String Password, Boolean TwitchEnabled)
+		public bool Authenticate(string Email, string Password, Boolean TwitchEnabled)
 		{
 			lock (locker)
 			{
@@ -99,16 +100,16 @@ namespace KMCCC.Yggdrasil
 		public Agent Agent { get; set; }
 
 		[JsonPropertyName("username")]
-		public String Email { get; set; }
+		public string Email { get; set; }
 
 		[JsonPropertyName("password")]
-		public String Password { get; set; }
+		public string Password { get; set; }
 
 		[JsonPropertyName("requestUser")]
-		public Boolean RequestUser { get; set; }
+		public bool RequestUser { get; set; }
 
 		[JsonPropertyName("clientToken")]
-		public String ClientToken { get; set; }
+		public string ClientToken { get; set; }
 	}
 
 	public class Agent
@@ -116,19 +117,19 @@ namespace KMCCC.Yggdrasil
 		public static readonly Agent Minecraft = new Agent { Name = "Minecraft", Version = 1 };
 
 		[JsonPropertyName("name")]
-		public String Name { get; set; }
+		public string Name { get; set; }
 
 		[JsonPropertyName("version")]
-		public Int32 Version { get; set; }
+		public int Version { get; set; }
 	}
 
 	public class AuthenticationResponse
 	{
 		[JsonPropertyName("clientToken")]
-		public String ClientToken { get; set; }
+		public string ClientToken { get; set; }
 
 		[JsonPropertyName("accessToken")]
-		public String AccessToken { get; set; }
+		public string AccessToken { get; set; }
 
 		[JsonPropertyName("availableProfiles")]
 		public List<GameProfile> AvailableProfiles { get; set; }
@@ -140,13 +141,13 @@ namespace KMCCC.Yggdrasil
 		public User User { get; set; }
 
 		[JsonPropertyName("error")]
-		public String Error { get; set; }
+		public string Error { get; set; }
 
 		[JsonPropertyName("errorMessage")]
-		public String ErrorMessage { get; set; }
+		public string ErrorMessage { get; set; }
 
 		[JsonPropertyName("cause")]
-		public String Cause { get; set; }
+		public string Cause { get; set; }
 	}
 
 	public class User
@@ -173,15 +174,15 @@ namespace KMCCC.Yggdrasil
 	public class GameProfile
 	{
 		[JsonPropertyName("id")]
-		public String ID { get; set; }
+		public string ID { get; set; }
 
 		[JsonPropertyName("name")]
-		public String name { get; set; }
+		public string name { get; set; }
 	}
 
 	internal static class Extensions
 	{
-		internal static String ToJson(this List<Property> properties)
+		internal static string ToJson(this List<Property> properties)
 		{
 			StringBuilder sb = new StringBuilder().Append('{');
 			foreach (var item in properties)
