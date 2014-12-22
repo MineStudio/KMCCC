@@ -28,20 +28,26 @@ namespace KMCCC.Simple
 				using (tw = new StreamWriter(fs))
 				{
 					//这里图方便没有检验LauncherCoreCreationOption.Create()返回的是不是null
-					LauncherCore core = LauncherCore.Create(LauncherCoreCreationOption.Create());
+					LauncherCore core = LauncherCore.Create();
 					core.GameExit += core_GameExit;
 					core.GameLog += core_GameLog;
-					handle = core.Launch(new LaunchOptions
+					var result = core.Launch(new LaunchOptions
 					{
 						Version = core.GetVersion("****"),
 						Authenticator = new OfflineAuthenticator("KBlackcn"),
 						//Authenticator = new YggdrasilLogin("****@****", "****", true),
 						Server = new ServerInfo { Address = "mc.hypixel.net" },
-						Mode = LaunchMode.BMCL,
+						Mode = LaunchMode.Own,
 						MaxMemory = 2048,
 						MinMemory = 1024,
 						Size = new WindowSize { Height = 768, Width = 1280 }
 					});
+					if (!result.Success)
+					{
+						MessageBox.Show(result.ErrorMessage, result.ErrorType.ToString());
+						return;
+					}
+					handle = result.Handle;
 					are.WaitOne();
 				}
 			}
@@ -51,6 +57,8 @@ namespace KMCCC.Simple
 		{
 			Console.WriteLine(line);
 			tw.WriteLine(line);
+
+			handle.SetTitle("啦啦啦");
 		}
 
 		static void core_GameExit(LaunchHandle handle, int code)

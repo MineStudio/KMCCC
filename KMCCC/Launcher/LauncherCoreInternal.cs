@@ -18,7 +18,7 @@ namespace KMCCC.Launcher
 
 		internal object locker = new object();
 
-		internal Version GetVersionInternal(string jsonPath)
+		internal Version getVersionInternal(string jsonPath)
 		{
 			try
 			{
@@ -80,62 +80,68 @@ namespace KMCCC.Launcher
 
 		#endregion
 
-		private MinecraftLaunchArguments GenerateArguments(LaunchOptions options)
+		private LaunchResult generateArguments(LaunchOptions options, ref MinecraftLaunchArguments args)
 		{
-			var authentication = options.Authenticator.Do();
-			if (String.IsNullOrWhiteSpace(authentication.Error))
+			try
 			{
-				MinecraftLaunchArguments args = new MinecraftLaunchArguments();
-				args.CGCEnabled = true;
-				args.MainClass = options.Version.MainClass;
-				args.MaxMemory = options.MaxMemory;
-				args.MinMemory = options.MinMemory;
-				args.NativePath = GameRootPath + @"\$natvies-" + Guid.NewGuid().ToString();
-				foreach (var native in options.Version.Natives)
+				var authentication = options.Authenticator.Do();
+				if (String.IsNullOrWhiteSpace(authentication.Error))
 				{
-					try
+					args.CGCEnabled = true;
+					args.MainClass = options.Version.MainClass;
+					args.MaxMemory = options.MaxMemory;
+					args.MinMemory = options.MinMemory;
+					args.NativePath = GameRootPath + @"\$natvies-" + Guid.NewGuid().ToString();
+					foreach (var native in options.Version.Natives)
 					{
-						ZipTools.Unzip(this.GetNativePath(native), args.NativePath, native.Options);
+						try
+						{
+							ZipTools.Unzip(this.GetNativePath(native), args.NativePath, native.Options);
+						}
+						catch { }
 					}
-					catch { }
+					args.Server = options.Server;
+					args.Size = options.Size;
+					args.Libraries = options.Version.Libraries.Select(lib => this.GetLibPath(lib)).ToList();
+					args.Libraries.Add(this.GetVersionJarPath(options.Version));
+					args.MinecraftArguments = options.Version.MinecraftArguments;
+					args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
+					args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
+					args.Tokens.Add("auth_player_name", authentication.DisplayName);
+					args.Tokens.Add("version_name", options.Version.Id);
+					args.Tokens.Add("game_directory", ".");
+					args.Tokens.Add("game_assets", "assets");
+					args.Tokens.Add("assets_root", "assets");
+					args.Tokens.Add("assets_index_name", options.Version.Assets);
+					args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
+					args.Tokens.Add("user_properties", authentication.Properties);
+					args.Tokens.Add("user_type", authentication.UserType);
+					args.AdvencedArguments = new List<string> { "-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true" };
+					args.authentication = authentication;
+					args.version = options.Version;
+					switch (options.Mode)
+					{
+						case LaunchMode.BMCL:
+							bmclmode(args);
+							break;
+						case LaunchMode.MCLauncher:
+							mcLaunchermode(args);
+							break;
+					}
+					return null;
 				}
-				args.Server = options.Server;
-				args.Size = options.Size;
-				args.Libraries = options.Version.Libraries.Select(lib => this.GetLibPath(lib)).ToList();
-				args.Libraries.Add(this.GetVersionJarPath(options.Version));
-				args.MinecraftArguments = options.Version.MinecraftArguments;
-				args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
-				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
-				args.Tokens.Add("auth_player_name", authentication.DisplayName);
-				args.Tokens.Add("version_name", options.Version.Id);
-				args.Tokens.Add("game_directory", ".");
-				args.Tokens.Add("game_assets", "assets");
-				args.Tokens.Add("assets_root", "assets");
-				args.Tokens.Add("assets_index_name", options.Version.Assets);
-				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
-				args.Tokens.Add("user_properties", authentication.Properties);
-				args.Tokens.Add("user_type", authentication.UserType);
-				args.AdvencedArguments = new List<string> { "-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true" };
-				args.authentication = authentication;
-				args.version = options.Version;
-				switch (options.Mode)
+				else
 				{
-					case LaunchMode.BMCL:
-						bmclmode(args);
-						break;
-					case LaunchMode.MCLauncher:
-						mcLaunchermode(args);
-						break;
+					return new LaunchResult { Success = false, ErrorType = ErrorType.AuthenticationFailed, ErrorMessage = "验证错误: " + authentication.Error };
 				}
-				return args;
 			}
-			else
+			catch
 			{
-				return null;
+				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "在生成参数时发生了意外的错误" };
 			}
 		}
 
-		private LaunchHandle launch(MinecraftLaunchArguments args)
+		private LaunchResult launch(MinecraftLaunchArguments args)
 		{
 			try
 			{
@@ -158,11 +164,11 @@ namespace KMCCC.Launcher
 						Directory.Delete(args.NativePath, true);
 						this.exit(handle, handle.process.ExitCode);
 					});
-				return handle;
+				return new LaunchResult { Success = true, Handle = handle };
 			}
 			catch (Exception)
 			{
-				return null;
+				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "启动时出现了异常" };
 			}
 		}
 

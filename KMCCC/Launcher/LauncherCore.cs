@@ -25,6 +25,11 @@ namespace KMCCC.Launcher
 			return launcherCore;
 		}
 
+		public static LauncherCore Create(string gameRootPath = null)
+		{
+			return Create(LauncherCoreCreationOption.Create(gameRootPath));
+		}
+
 		private LauncherCore()
 		{
 
@@ -84,7 +89,7 @@ namespace KMCCC.Launcher
 				if (!Directory.Exists(versionPath)) { return null; }
 				versionPath = versionPath + '\\' + id + ".json";
 				if (!File.Exists(versionPath)) { return null; }
-				return GetVersionInternal(versionPath);
+				return getVersionInternal(versionPath);
 			}
 		}
 
@@ -100,23 +105,28 @@ namespace KMCCC.Launcher
 		/// </summary>
 		/// <param name="options">启动选项</param>
 		/// <param name="argumentsOperators">启动参数的修改器</param>
-		/// <returns>启动句柄</returns>
-		public LaunchHandle Launch(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
+		/// <returns>启动结果</returns>
+		public LaunchResult Launch(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{
 			lock (locker)
 			{
-				if (!File.Exists(JavaPath)) { return null; }
+				if (!File.Exists(JavaPath)) { return new LaunchResult { Success = false, ErrorType = ErrorType.NoJAVA, ErrorMessage = "指定的JAVA位置不存在" }; }
 				currentCode = random.Next();
-				var args = GenerateArguments(options);
-				if (args == null) { return null; }
+				MinecraftLaunchArguments args = new MinecraftLaunchArguments();
+				var result = generateArguments(options, ref args);
+				if (result != null) { return result; }
 				if (argumentsOperators != null)
 				{
 					foreach (var opt in argumentsOperators)
 					{
-						if (opt != null)
+						try
 						{
-							opt(args);
+							if (opt != null)
+							{
+								opt(args);
+							}
 						}
+						catch { return new LaunchResult { Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常" }; };
 					}
 				}
 				return this.launch(args);
@@ -147,17 +157,17 @@ namespace KMCCC.Launcher
 		/// <summary>
 		/// 创建“创建选项”
 		/// </summary>
-		/// <param name="GameRootPath">游戏根目录</param>
-		/// <param name="JavaPath">JAVA目录</param>
+		/// <param name="gameRootPath">游戏根目录</param>
+		/// <param name="javaPath">JAVA目录</param>
 		/// <returns></returns>
-		public static LauncherCoreCreationOption Create(string GameRootPath = null, string JavaPath = null)
+		public static LauncherCoreCreationOption Create(string gameRootPath = null, string javaPath = null)
 		{
-			GameRootPath = GameRootPath ?? ".minecraft";
-			JavaPath = JavaPath ?? SystemTools.FindJava();
-			if (!Directory.Exists(GameRootPath)) { Directory.CreateDirectory(GameRootPath); }
+			gameRootPath = gameRootPath ?? ".minecraft";
+			javaPath = javaPath ?? SystemTools.FindJava();
+			if (!Directory.Exists(gameRootPath)) { Directory.CreateDirectory(gameRootPath); }
 			LauncherCoreCreationOption option = new LauncherCoreCreationOption();
-			option.GameRootPath = new DirectoryInfo(GameRootPath).FullName;
-			option.JavaPath = JavaPath;
+			option.GameRootPath = new DirectoryInfo(gameRootPath).FullName;
+			option.JavaPath = javaPath;
 			return option;
 		}
 
@@ -170,5 +180,55 @@ namespace KMCCC.Launcher
 		/// JAVA地址
 		/// </summary>
 		public string JavaPath { get; internal set; }
+	}
+
+	/// <summary>
+	/// 启动后返回的启动结果
+	/// </summary>
+	public class LaunchResult
+	{
+		/// <summary>
+		/// 获取是否启动成功
+		/// </summary>
+		public bool Success { get; set; }
+
+		/// <summary>
+		/// 获取发生的错误类型
+		/// </summary>
+		public ErrorType ErrorType { get; set; }
+
+		/// <summary>
+		/// 获取错误信息
+		/// </summary>
+		public string ErrorMessage { get; set; }
+
+		/// <summary>
+		/// 获取启动句柄
+		/// </summary>
+		public LaunchHandle Handle { get; set; }
+	}
+
+	public enum ErrorType
+	{
+		/// <summary>
+		/// 没有错误
+		/// </summary>
+		None,
+		/// <summary>
+		/// 没有找到JAVA
+		/// </summary>
+		NoJAVA,
+		/// <summary>
+		/// 验证失败
+		/// </summary>
+		AuthenticationFailed,
+		/// <summary>
+		/// 操作器出现故障
+		/// </summary>
+		OperatorException,
+		/// <summary>
+		/// 未知
+		/// </summary>
+		Unknown
 	}
 }
