@@ -12,18 +12,18 @@ namespace KMCCC.Tools
 	public class SystemTools
 	{
 		/// <summary>
-		/// 找JAVA
+		/// 从注册表中查找可能的JRE位置
 		/// </summary>
-		/// <returns>JAVA地址</returns>
-		public static string FindJava()
-		{
+		/// <returns>JAVA地址列表</returns>
+		public static IEnumerable<string>  FindJava()
+		{ 
 			try
 			{
-				RegistryKey reg = Registry.LocalMachine;
-				var openSubKey = reg.OpenSubKey("SOFTWARE");
-				if (openSubKey != null)
+				SortedSet<string> list = new SortedSet<string>();
+				var reg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
+				if (reg != null)
 				{
-					var registryKey = openSubKey.OpenSubKey("JavaSoft");
+					var registryKey = reg.OpenSubKey("JavaSoft");
 					if (registryKey != null)
 						reg = registryKey.OpenSubKey("Java Runtime Environment");
 				}
@@ -37,14 +37,14 @@ namespace KMCCC.Tools
 							{
 								string str = command.GetValue("JavaHome").ToString();
 								if (str != "")
-									return str + @"\bin\javaw.exe";
+									list.Add(str + @"\bin\javaw.exe");
 							}
 						}
-						catch { return null; }
+						catch { }
 					}
-				return null;
+				return list;
 			}
-			catch { return null; }
+			catch { return new string[0]; }
 		}
 
 		/// <summary>
