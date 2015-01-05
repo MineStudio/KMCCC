@@ -126,7 +126,7 @@ namespace KMCCC.Launcher
 								opt(args);
 							}
 						}
-						catch { return new LaunchResult { Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常" }; };
+						catch(Exception exp) { return new LaunchResult { Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp}; };
 					}
 				}
 				return this.launch(args);
@@ -201,6 +201,11 @@ namespace KMCCC.Launcher
 		/// 获取错误信息
 		/// </summary>
 		public string ErrorMessage { get; set; }
+
+		/// <summary>
+		/// 启动时发生异常
+		/// </summary>
+		public Exception Exception { get; set; }
 
 		/// <summary>
 		/// 获取启动句柄

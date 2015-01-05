@@ -135,9 +135,9 @@ namespace KMCCC.Launcher
 					return new LaunchResult { Success = false, ErrorType = ErrorType.AuthenticationFailed, ErrorMessage = "验证错误: " + authentication.Error };
 				}
 			}
-			catch
+			catch(Exception exp)
 			{
-				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "在生成参数时发生了意外的错误" };
+				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "在生成参数时发生了意外的错误", Exception = exp};
 			}
 		}
 
@@ -166,9 +166,9 @@ namespace KMCCC.Launcher
 					});
 				return new LaunchResult { Success = true, Handle = handle };
 			}
-			catch (Exception)
+			catch (Exception exp)
 			{
-				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "启动时出现了异常" };
+				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "启动时出现了异常", Exception = exp};
 			}
 		}
 
