@@ -1,230 +1,148 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using KMCCC.Tools;
-using KMCCC.Version;
-using LitJson;
-
-namespace KMCCC.Launcher
+﻿namespace KMCCC.Launcher
 {
+	#region
+
+	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.IO;
+	using System.Linq;
+	using System.Runtime.InteropServices;
+	using System.Threading.Tasks;
+	using Tools;
+
+	#endregion
+
 	partial class LauncherCore
 	{
-		#region GetVesion
+		internal object Locker = new object();
 
-		internal object locker = new object();
 
-		internal Version getVersionInternal(string jsonPath)
-		{
-			try
-			{
-				Version ver = new Version();
-				var json = File.ReadAllText(jsonPath);
-				var jver = JsonMapper.ToObject<JVersion>(json);
-				if (String.IsNullOrWhiteSpace(jver.Id)) { return null; }
-				if (String.IsNullOrWhiteSpace(jver.MinecraftArguments)) { return null; }
-				if (String.IsNullOrWhiteSpace(jver.MainClass)) { return null; }
-				if (String.IsNullOrWhiteSpace(jver.Assets)) { jver.Assets = "legacy"; }
-				if (jver.Libraries == null) { return null; }
-				ver.Id = jver.Id;
-				ver.MinecraftArguments = jver.MinecraftArguments;
-				ver.Assets = jver.Assets;
-				ver.MainClass = jver.MainClass;
-				ver.Libraries = new List<Library>();
-				ver.Natives = new List<Native>();
-				foreach (var lib in jver.Libraries)
-				{
-					if (String.IsNullOrWhiteSpace(lib.Name)) { continue; }
-					var names = lib.Name.Split(':');
-					if (names.Length != 3) { continue; }
-					if (lib.Natives == null)
-					{
-						if (!IfAllowed(lib.Rules)) { continue; }
-						ver.Libraries.Add(new Library
-						{
-							NS = names[0],
-							Name = names[1],
-							Version = names[2]
-						});
-					}
-					else
-					{
-						if (!IfAllowed(lib.Rules)) { continue; }
-						var native = new Native
-						{
-							NS = names[0],
-							Name = names[1],
-							Version = names[2],
-							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch())
-						};
-						ver.Natives.Add(native);
-						if (lib.Extract != null)
-						{
-							native.Options = new UnzipOptions();
-							native.Options.Exclude = lib.Extract.Exculde;
-						}
-					}
-				}
-				return ver;
-			}
-			catch
-			{
-				return null;
-			}
-
-		}
-
-		#endregion
-
-		private LaunchResult generateArguments(LaunchOptions options, ref MinecraftLaunchArguments args)
+		private LaunchResult GenerateArguments(LaunchOptions options, ref MinecraftLaunchArguments args)
 		{
 			try
 			{
 				var authentication = options.Authenticator.Do();
-				if (String.IsNullOrWhiteSpace(authentication.Error))
-				{
-					args.CGCEnabled = true;
-					args.MainClass = options.Version.MainClass;
-					args.MaxMemory = options.MaxMemory;
-					args.MinMemory = options.MinMemory;
-					args.NativePath = GameRootPath + @"\$natvies-" + Guid.NewGuid().ToString();
-					foreach (var native in options.Version.Natives)
+				if (!String.IsNullOrWhiteSpace(authentication.Error))
+					return new LaunchResult
 					{
-						try
+						Success = false,
+						ErrorType = ErrorType.AuthenticationFailed,
+						ErrorMessage = "验证错误: " + authentication.Error
+					};
+				args.CGCEnabled = true;
+				args.MainClass = options.Version.MainClass;
+				args.MaxMemory = options.MaxMemory;
+				args.MinMemory = options.MinMemory;
+				args.NativePath = GameRootPath + @"\$natvies-" + Guid.NewGuid();
+				foreach (var native in options.Version.Natives)
+				{
+					try
+					{
+						ZipTools.Unzip(this.GetNativePath(native), args.NativePath, native.Options);
+					}
+					catch (Exception exp)
+					{
+						return new LaunchResult
 						{
-							ZipTools.Unzip(this.GetNativePath(native), args.NativePath, native.Options);
-						}
-						catch { }
+							Success = false,
+							ErrorType = ErrorType.UncompressingFailed,
+							ErrorMessage = string.Format("解压错误: {0}:{1}:{2}", native.NS, native.Name, native.Version),
+							Exception = exp
+						};
 					}
-					args.Server = options.Server;
-					args.Size = options.Size;
-					args.Libraries = options.Version.Libraries.Select(lib => this.GetLibPath(lib)).ToList();
-					args.Libraries.Add(this.GetVersionJarPath(options.Version));
-					args.MinecraftArguments = options.Version.MinecraftArguments;
-					args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
-					args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
-					args.Tokens.Add("auth_player_name", authentication.DisplayName);
-					args.Tokens.Add("version_name", options.Version.Id);
-					args.Tokens.Add("game_directory", ".");
-					args.Tokens.Add("game_assets", "assets");
-					args.Tokens.Add("assets_root", "assets");
-					args.Tokens.Add("assets_index_name", options.Version.Assets);
-					args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
-					args.Tokens.Add("user_properties", authentication.Properties);
-					args.Tokens.Add("user_type", authentication.UserType);
-					args.AdvencedArguments = new List<string> { "-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true" };
-					args.authentication = authentication;
-					args.version = options.Version;
-					switch (options.Mode)
-					{
-						case LaunchMode.BMCL:
-							bmclmode(args);
-							break;
-						case LaunchMode.MCLauncher:
-							mcLaunchermode(args);
-							break;
-					}
-					return null;
 				}
-				else
+				args.Server = options.Server;
+				args.Size = options.Size;
+				args.Libraries = options.Version.Libraries.Select(this.GetLibPath).ToList();
+				args.Libraries.Add(this.GetVersionJarPath(options.Version));
+				args.MinecraftArguments = options.Version.MinecraftArguments;
+				args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
+				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
+				args.Tokens.Add("auth_player_name", authentication.DisplayName);
+				args.Tokens.Add("version_name", options.Version.Id);
+				args.Tokens.Add("game_directory", ".");
+				args.Tokens.Add("game_assets", "assets");
+				args.Tokens.Add("assets_root", "assets");
+				args.Tokens.Add("assets_index_name", options.Version.Assets);
+				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
+				args.Tokens.Add("user_properties", authentication.Properties);
+				args.Tokens.Add("user_type", authentication.UserType);
+				args.AdvencedArguments = new List<string> {"-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true"};
+				args.Authentication = authentication;
+				args.Version = options.Version;
+				switch (options.Mode)
 				{
-					return new LaunchResult { Success = false, ErrorType = ErrorType.AuthenticationFailed, ErrorMessage = "验证错误: " + authentication.Error };
+					case LaunchMode.BMCL:
+						Bmclmode(args);
+						break;
+					case LaunchMode.McLauncher:
+						McLaunchermode(args);
+						break;
 				}
-			}
-			catch(Exception exp)
-			{
-				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "在生成参数时发生了意外的错误", Exception = exp};
-			}
-		}
-
-		private LaunchResult launch(MinecraftLaunchArguments args)
-		{
-			try
-			{
-				LaunchHandle handle = new LaunchHandle(args.authentication);
-				handle.code = this.currentCode;
-				handle.core = this;
-				ProcessStartInfo psi = new ProcessStartInfo(this.JavaPath);
-				psi.Arguments = args.ToArguments();
-				psi.UseShellExecute = false;
-				psi.WorkingDirectory = GameRootPath;
-				psi.RedirectStandardError = true;
-				psi.RedirectStandardOutput = true;
-				handle.process = Process.Start(psi);
-				handle.work();
-				Task task = Task.Factory.StartNew(() =>
-				{
-					handle.process.WaitForExit();
-				}).ContinueWith(t =>
-					{
-						Directory.Delete(args.NativePath, true);
-						this.exit(handle, handle.process.ExitCode);
-					});
-				return new LaunchResult { Success = true, Handle = handle };
+				return null;
 			}
 			catch (Exception exp)
 			{
-				return new LaunchResult { Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "启动时出现了异常", Exception = exp};
+				return new LaunchResult {Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "在生成参数时发生了意外的错误", Exception = exp};
 			}
 		}
 
-		private void bmclmode(MinecraftLaunchArguments args)
+		private void Bmclmode(MinecraftLaunchArguments args)
 		{
-			operateDirectory("mods", args.version.Id);
-			operateDirectory("coremods", args.version.Id);
-			operateDirectories(this.GetVersionRootPath(args.version));
+			OperateDirectory("mods", args.Version.Id);
+			OperateDirectory("coremods", args.Version.Id);
+			OperateDirectories(this.GetVersionRootPath(args.Version));
 		}
 
-		private void mcLaunchermode(MinecraftLaunchArguments args)
+		private static void McLaunchermode(MinecraftLaunchArguments args)
 		{
-			args.Tokens["game_directory"] = String.Format(@".\versions\{0}\", args.version.Id);
+			args.Tokens["game_directory"] = String.Format(@".\versions\{0}\", args.Version.Id);
 		}
 
-		private void operateDirectory(string name, string ver)
+		private void OperateDirectory(string name, string ver)
 		{
-			operateDirectoryInternal(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, name, ver),
-									 String.Format(@"{0}\{1}", GameRootPath, name));
+			OperateDirectoryInternal(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, name, ver),
+				String.Format(@"{0}\{1}", GameRootPath, name));
 		}
 
-		private void operateDirectoryInternal(string source, string target)
+		private void OperateDirectoryInternal(string source, string target)
 		{
-			int code = currentCode;
-			if (Directory.Exists(source))
+			var code = CurrentCode;
+			if (!Directory.Exists(source)) return;
+			if (Directory.Exists(target))
 			{
-				if (Directory.Exists(target))
+				Directory.Delete(target, true);
+			}
+			UsefulTools.Dircopy(source, target);
+			Action<LaunchHandle, int> handler = null;
+			handler = (handle, c) =>
+			{
+				if (handle.Code == code)
 				{
+					Directory.Delete(source, true);
+					UsefulTools.Dircopy(target, source);
 					Directory.Delete(target, true);
 				}
-				UsefulTools.Dircopy(source, target); Action<LaunchHandle, int> handler = null;
-				handler = (handle, c) =>
-				{
-					if (handle.code == code)
-					{
-						Directory.Delete(source, true);
-						UsefulTools.Dircopy(target, source);
-						Directory.Delete(target, true);
-					}
-					GameExit -= handler;
-				};
-				GameExit += handler;
-			}
+				GameExit -= handler;
+			};
+			GameExit += handler;
 		}
 
-		private void operateDirectories(string ver)
+		private void OperateDirectories(string ver)
 		{
 			var root = String.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
-			if (!Directory.Exists(root)) { return; }
+			if (!Directory.Exists(root))
+			{
+				return;
+			}
 			foreach (var dir in new DirectoryInfo(root).EnumerateDirectories())
 			{
-				operateDirectoryInternal(dir.FullName, String.Format(@"{0}\{1}", GameRootPath, dir.Name));
+				OperateDirectoryInternal(dir.FullName, String.Format(@"{0}\{1}", GameRootPath, dir.Name));
 			}
 		}
 
-		internal void log(LaunchHandle handle, string line)
+		internal void Log(LaunchHandle handle, string line)
 		{
 			if (GameLog != null)
 			{
@@ -232,7 +150,7 @@ namespace KMCCC.Launcher
 			}
 		}
 
-		internal void exit(LaunchHandle handle, int code)
+		internal void Exit(LaunchHandle handle, int code)
 		{
 			if (GameExit != null)
 			{
@@ -240,31 +158,33 @@ namespace KMCCC.Launcher
 			}
 		}
 
-		/// <summary>
-		/// 判断一系列规则后是否启用
-		/// </summary>
-		/// <param name="rules">规则们</param>
-		/// <returns>是否启用</returns>
-		public Boolean IfAllowed(List<JRule> rules)
+		private LaunchResult LaunchInternal(MinecraftLaunchArguments args)
 		{
-			if (rules == null) { return true; }
-			if (rules.Count == 0) { return true; }
-			var allowed = false;
-			foreach (var rule in rules)
+			try
 			{
-				if (rule.OS == null)
+				var handle = new LaunchHandle(args.Authentication) {Code = CurrentCode, Core = this};
+				var psi = new ProcessStartInfo(JavaPath)
 				{
-					allowed = rule.Action == "allow";
-					continue;
-				}
-				if (rule.OS.Name == "windows")
+					Arguments = args.ToArguments(),
+					UseShellExecute = false,
+					WorkingDirectory = GameRootPath,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true
+				};
+				handle.Process = Process.Start(psi);
+				handle.Work();
+				Task.Factory.StartNew(handle.Process.WaitForExit).ContinueWith(t =>
 				{
-					allowed = rule.Action == "allow";
-				}
+					Directory.Delete(args.NativePath, true);
+					Exit(handle, handle.Process.ExitCode);
+				});
+				return new LaunchResult {Success = true, Handle = handle};
 			}
-			return allowed;
+			catch (Exception exp)
+			{
+				return new LaunchResult {Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "启动时出现了异常", Exception = exp};
+			}
 		}
-
 	}
 
 	public static class LaunchHandleExtensions
@@ -273,12 +193,14 @@ namespace KMCCC.Launcher
 		{
 			try
 			{
-				SetWindowText(handle.process.MainWindowHandle, title);
+				SetWindowText(handle.Process.MainWindowHandle, title);
 			}
-			catch { }
+			catch
+			{
+			}
 		}
 
 		[DllImport("User32.dll")]
-		public static extern int SetWindowText(IntPtr WinHandle, string Title);
+		public static extern int SetWindowText(IntPtr winHandle, string title);
 	}
 }

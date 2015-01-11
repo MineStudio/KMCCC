@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using LitJson;
-
-namespace KMCCC.Version
+﻿namespace KMCCC.Modules.JVersion
 {
+	#region
+
+	using System;
+	using System.Collections.Generic;
+	using LitJson;
+
+	#endregion
+
 	/// <summary>
-	/// 用来Json的实体类
+	///     用来Json的实体类
 	/// </summary>
 	public class JVersion
 	{
@@ -60,10 +62,10 @@ namespace KMCCC.Version
 		public string Action { get; set; }
 
 		[JsonPropertyName("os")]
-		public JOS OS { get; set; }
+		public JOperatingSystem OS { get; set; }
 	}
 
-	public class JOS
+	public class JOperatingSystem
 	{
 		[JsonPropertyName("name")]
 		public string Name { get; set; }

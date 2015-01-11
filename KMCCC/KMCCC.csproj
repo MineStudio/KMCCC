@@ -16,7 +16,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -52,7 +52,6 @@
     <Compile Include="Launcher\LauncherCoreInternal.cs" />
     <Compile Include="Launcher\Version.cs" />
     <Compile Include="Launcher\LaunchArguments.cs" />
-    <Compile Include="Modules\JVersion.cs" />
     <Compile Include="LitJson\IJsonWrapper.cs" />
     <Compile Include="LitJson\JsonData.cs" />
     <Compile Include="LitJson\JsonException.cs" />
@@ -63,9 +62,10 @@
     <Compile Include="LitJson\JsonWriter.cs" />
     <Compile Include="LitJson\Lexer.cs" />
     <Compile Include="LitJson\ParserToken.cs" />
-    <Compile Include="Modules\YggdrasilClient.cs" />
+    <Compile Include="Modules\JVersion\JVersion.cs" />
+    <Compile Include="Modules\JVersion\JVersionLocator.cs" />
+    <Compile Include="Modules\Yggdrasil\YggdrasilClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tools\HttpGP.cs" />
     <Compile Include="Tools\SystemTools.cs" />
     <Compile Include="Tools\UsefulTools.cs" />
     <Compile Include="Tools\ZipTools.cs" />

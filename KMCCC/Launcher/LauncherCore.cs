@@ -1,214 +1,225 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using KMCCC.Tools;
-
-namespace KMCCC.Launcher
+﻿namespace KMCCC.Launcher
 {
+	#region
+
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using Modules.JVersion;
+	using Tools;
+
+	#endregion
+
 	/// <summary>
-	/// 启动器核心
+	///     启动器核心
 	/// </summary>
 	public partial class LauncherCore
 	{
-		/// <summary>
-		/// 从CreationOption创建启动器核心
-		/// </summary>
-		/// <param name="option">启动器创建选项</param>
-		/// <returns>创建的启动器核心</returns>
-		public static LauncherCore Create(LauncherCoreCreationOption option)
-		{
-			LauncherCore launcherCore = new LauncherCore();
-			launcherCore.GameRootPath = option.GameRootPath;
-			launcherCore.JavaPath = option.JavaPath;
-			return launcherCore;
-		}
+		internal int CurrentCode;
 
-		public static LauncherCore Create(string gameRootPath = null)
-		{
-			return Create(LauncherCoreCreationOption.Create(gameRootPath));
-		}
-
-		private LauncherCore()
-		{
-
-		}
-
-		/// <summary>
-		/// 游戏根目录
-		/// </summary>
-		public string GameRootPath { get; private set; }
-
-		/// <summary>
-		/// JAVA目录
-		/// </summary>
-		public string JavaPath { get; set; }
+		internal Random Random = new Random();
+		private IVersionLocator _versionLocator;
 
 		#region GetVersion
 
 		/// <summary>
-		/// 返回包含全部版本数组
+		///     返回包含全部版本数组
 		/// </summary>
 		/// <returns>版本数组</returns>
-		public Version[] GetVersions()
+		public IEnumerable<Version> GetVersions()
 		{
-			lock (locker)
-			{
-				try
-				{
-					var directories = new DirectoryInfo(GameRootPath + @"\versions\").EnumerateDirectories();
-					LinkedList<Version> result = new LinkedList<Version>();
-					foreach (var directory in directories)
-					{
-						var ver = GetVersion(directory.Name);
-						if (ver != null)
-						{
-							result.AddFirst(ver);
-						}
-					}
-					return result.ToArray();
-				}
-				catch
-				{
-					return new Version[0];
-				}
-			}
+			return (VersionLocator == null)
+				? new Version[0]
+				: _versionLocator.GetAllVersions();
 		}
 
 		/// <summary>
-		/// 返回指定id的版本
+		///     返回指定id的版本
 		/// </summary>
 		/// <param name="id">要指定的ID</param>
 		/// <returns>指定的版本</returns>
 		public Version GetVersion(string id)
 		{
-			lock (locker)
-			{
-				var versionPath = GameRootPath + @"\versions\" + id;
-				if (!Directory.Exists(versionPath)) { return null; }
-				versionPath = versionPath + '\\' + id + ".json";
-				if (!File.Exists(versionPath)) { return null; }
-				return getVersionInternal(versionPath);
-			}
+			return (VersionLocator == null)
+				? null
+				: _versionLocator.Locate(id);
 		}
 
 		#endregion
 
+		private LauncherCore()
+		{
+		}
+
 		/// <summary>
-		/// 启动函数
-		/// 过程：
-		/// 1. 运行验证器(authenticator)，出错返回null
-		/// 2. 继续构造启动参数
-		/// 3. 遍历Operators对启动参数进行修改
-		/// 4. 启动
+		///     游戏根目录
+		/// </summary>
+		public string GameRootPath { get; private set; }
+
+		/// <summary>
+		///     JAVA目录
+		/// </summary>
+		public string JavaPath { get; set; }
+
+		/// <summary>
+		///     版本定位器
+		/// </summary>
+		public IVersionLocator VersionLocator
+		{
+			get { return _versionLocator; }
+			set { (_versionLocator = value).Core = this; }
+		}
+
+		/// <summary>
+		///     从CreationOption创建启动器核心
+		/// </summary>
+		/// <param name="option">启动器创建选项</param>
+		/// <returns>创建的启动器核心</returns>
+		public static LauncherCore Create(LauncherCoreCreationOption option)
+		{
+			var launcherCore = new LauncherCore
+			{
+				GameRootPath = option.GameRootPath,
+				JavaPath = option.JavaPath,
+				VersionLocator = option.VersionLocator
+			};
+			return launcherCore;
+		}
+
+		public static LauncherCore Create(string gameRootPath = null)
+		{
+			return Create(new LauncherCoreCreationOption(new DirectoryInfo(gameRootPath ?? @".minecraft").FullName));
+		}
+
+		/// <summary>
+		///     启动函数
+		///     过程：
+		///     1. 运行验证器(authenticator)，出错返回null
+		///     2. 继续构造启动参数
+		///     3. 遍历Operators对启动参数进行修改
+		///     4. 启动
 		/// </summary>
 		/// <param name="options">启动选项</param>
 		/// <param name="argumentsOperators">启动参数的修改器</param>
 		/// <returns>启动结果</returns>
 		public LaunchResult Launch(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{
-			lock (locker)
+			lock (Locker)
 			{
-				if (!File.Exists(JavaPath)) { return new LaunchResult { Success = false, ErrorType = ErrorType.NoJAVA, ErrorMessage = "指定的JAVA位置不存在" }; }
-				currentCode = random.Next();
-				MinecraftLaunchArguments args = new MinecraftLaunchArguments();
-				var result = generateArguments(options, ref args);
-				if (result != null) { return result; }
-				if (argumentsOperators != null)
+				if (!File.Exists(JavaPath))
 				{
-					foreach (var opt in argumentsOperators)
+					return new LaunchResult {Success = false, ErrorType = ErrorType.NoJAVA, ErrorMessage = "指定的JAVA位置不存在"};
+				}
+				CurrentCode = Random.Next();
+				var args = new MinecraftLaunchArguments();
+				var result = GenerateArguments(options, ref args);
+				if (result != null)
+				{
+					return result;
+				}
+				if (argumentsOperators == null) return LaunchInternal(args);
+				foreach (var opt in argumentsOperators)
+				{
+					try
 					{
-						try
+						if (opt != null)
 						{
-							if (opt != null)
-							{
-								opt(args);
-							}
+							opt(args);
 						}
-						catch(Exception exp) { return new LaunchResult { Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp}; };
+					}
+					catch (Exception exp)
+					{
+						return new LaunchResult {Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp};
 					}
 				}
-				return this.launch(args);
+				return LaunchInternal(args);
 			}
 		}
 
 		/// <summary>
-		/// 游戏退出事件
+		///     游戏退出事件
 		/// </summary>
 		public event Action<LaunchHandle, int> GameExit;
 
 		/// <summary>
-		/// 游戏Log事件
+		///     游戏Log事件
 		/// </summary>
 		public event Action<LaunchHandle, string> GameLog;
-
-		internal int currentCode;
-
-		internal Random random = new Random();
 	}
 
 	/// <summary>
-	///	启动器核心创建选项
-	///	以后可能包含更多内容
+	///     启动器核心选项
+	///     以后可能包含更多内容
 	/// </summary>
 	public class LauncherCoreCreationOption
 	{
 		/// <summary>
-		/// 创建“创建选项”
+		///     核心选项
 		/// </summary>
-		/// <param name="gameRootPath">游戏根目录</param>
-		/// <param name="javaPath">JAVA目录</param>
-		/// <returns></returns>
-		public static LauncherCoreCreationOption Create(string gameRootPath = null, string javaPath = null)
+		/// <param name="gameRootPath">游戏根目录，默认为 ./.minecraft </param>
+		/// <param name="javaPath">JAVA地址，默认为自动搜寻所的第一个</param>
+		/// <param name="versionLocator">Version定位器，默认为 JVersionLoacator</param>
+		public LauncherCoreCreationOption(string gameRootPath = null, string javaPath = null, IVersionLocator versionLocator = null)
 		{
-			gameRootPath = gameRootPath ?? ".minecraft";
-			javaPath = javaPath ?? SystemTools.FindJava().FirstOrDefault();
-			if (!Directory.Exists(gameRootPath)) { Directory.CreateDirectory(gameRootPath); }
-			LauncherCoreCreationOption option = new LauncherCoreCreationOption();
-			option.GameRootPath = new DirectoryInfo(gameRootPath).FullName;
-			option.JavaPath = javaPath;
-			return option;
+			GameRootPath = gameRootPath ?? ".minecraft";
+			JavaPath = javaPath ?? SystemTools.FindJava().FirstOrDefault();
+			VersionLocator = versionLocator ?? new JVersionLocator();
+			if (!Directory.Exists(GameRootPath))
+			{
+				Directory.CreateDirectory(GameRootPath);
+			}
 		}
 
 		/// <summary>
-		/// 游戏根目录
+		///     游戏根目录
 		/// </summary>
 		public string GameRootPath { get; internal set; }
 
 		/// <summary>
-		/// JAVA地址
+		///     JAVA地址
 		/// </summary>
 		public string JavaPath { get; internal set; }
+
+		/// <summary>
+		///     Version定位器
+		/// </summary>
+		public IVersionLocator VersionLocator { get; internal set; }
+
+		[Obsolete]
+		public static LauncherCoreCreationOption Create(string gameRootPath = null, string javaPath = null, IVersionLocator versionLocator = null)
+		{
+			return new LauncherCoreCreationOption(gameRootPath, javaPath, versionLocator);
+		}
 	}
 
 	/// <summary>
-	/// 启动后返回的启动结果
+	///     启动后返回的启动结果
 	/// </summary>
 	public class LaunchResult
 	{
 		/// <summary>
-		/// 获取是否启动成功
+		///     获取是否启动成功
 		/// </summary>
 		public bool Success { get; set; }
 
 		/// <summary>
-		/// 获取发生的错误类型
+		///     获取发生的错误类型
 		/// </summary>
 		public ErrorType ErrorType { get; set; }
 
 		/// <summary>
-		/// 获取错误信息
+		///     获取错误信息
 		/// </summary>
 		public string ErrorMessage { get; set; }
 
 		/// <summary>
-		/// 启动时发生异常
+		///     启动时发生异常
 		/// </summary>
 		public Exception Exception { get; set; }
 
 		/// <summary>
-		/// 获取启动句柄
+		///     获取启动句柄
 		/// </summary>
 		public LaunchHandle Handle { get; set; }
 	}
@@ -216,24 +227,33 @@ namespace KMCCC.Launcher
 	public enum ErrorType
 	{
 		/// <summary>
-		/// 没有错误
+		///     没有错误
 		/// </summary>
 		None,
+
 		/// <summary>
-		/// 没有找到JAVA
+		///     没有找到JAVA
 		/// </summary>
 		NoJAVA,
+
 		/// <summary>
-		/// 验证失败
+		///     验证失败
 		/// </summary>
 		AuthenticationFailed,
+
 		/// <summary>
-		/// 操作器出现故障
+		///     操作器出现故障
 		/// </summary>
 		OperatorException,
+
 		/// <summary>
-		/// 未知
+		///     未知
 		/// </summary>
-		Unknown
+		Unknown,
+
+		/// <summary>
+		///     解压错误
+		/// </summary>
+		UncompressingFailed
 	}
 }

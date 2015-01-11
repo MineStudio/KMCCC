@@ -1,34 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
-using KMCCC.Authentication;
-using KMCCC.Launcher;
-using KMCCC.Tools;
-
-namespace KMCCC.Simple
+﻿namespace KMCCC.Simple
 {
-	class Program
+	#region
+
+	using System;
+	using System.IO;
+	using System.Threading;
+	using Authentication;
+	using Launcher;
+
+	#endregion
+
+	internal class Program
 	{
-		private static FileStream fs;
+		private static FileStream _fs;
 
-		private static TextWriter tw;
+		private static TextWriter _tw;
 
-		private static AutoResetEvent are = new AutoResetEvent(false);
+		private static readonly AutoResetEvent Are = new AutoResetEvent(false);
 
-		private static LaunchHandle handle;
-
-		static void Main(string[] args)
+		private static void Main()
 		{
-			using (fs = new FileStream("mc.log", FileMode.Create))
+			using (_fs = new FileStream("mc.log", FileMode.Create))
 			{
-				using (tw = new StreamWriter(fs))
+				using (_tw = new StreamWriter(_fs))
 				{
 					//这里图方便没有检验LauncherCoreCreationOption.Create()返回的是不是null
-					LauncherCore core = LauncherCore.Create();
+					var core = LauncherCore.Create();
 					core.GameExit += core_GameExit;
 					core.GameLog += core_GameLog;
 					var result = core.Launch(new LaunchOptions
@@ -36,36 +33,41 @@ namespace KMCCC.Simple
 						Version = core.GetVersion("****"),
 						Authenticator = new OfflineAuthenticator("KBlackcn"),
 						//Authenticator = new YggdrasilLogin("****@****", "****", true),
-						Server = new ServerInfo { Address = "mc.hypixel.net" },
+						Server = new ServerInfo {Address = "mc.hypixel.net"},
 						Mode = LaunchMode.Own,
 						MaxMemory = 2048,
 						MinMemory = 1024,
-						Size = new WindowSize { Height = 768, Width = 1280 }
-					});
+						Size = new WindowSize {Height = 768, Width = 1280}
+					}, (Action<MinecraftLaunchArguments>) (x => { }));
 					if (!result.Success)
 					{
-						MessageBox.Show(result.ErrorMessage, result.ErrorType.ToString());
+						Console.WriteLine("启动失败：[{0}] {1}", result.ErrorType, result.ErrorMessage);
+						if (result.Exception != null)
+						{
+							Console.WriteLine(result.Exception.Message);
+							Console.WriteLine(result.Exception.Source);
+							Console.WriteLine(result.Exception.StackTrace);
+						}
+						Console.ReadKey();
 						return;
 					}
-					handle = result.Handle;
-					are.WaitOne();
+					Are.WaitOne();
+					Console.ReadKey();
 				}
 			}
 		}
 
-		static void core_GameLog(LaunchHandle handle, string line)
+		private static void core_GameLog(LaunchHandle handle, string line)
 		{
 			Console.WriteLine(line);
-			tw.WriteLine(line);
+			_tw.WriteLine(line);
 
 			handle.SetTitle("啦啦啦");
 		}
 
-		static void core_GameExit(LaunchHandle handle, int code)
+		private static void core_GameExit(LaunchHandle handle, int code)
 		{
-			are.Set();
+			Are.Set();
 		}
-
-
 	}
 }

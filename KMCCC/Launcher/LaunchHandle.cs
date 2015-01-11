@@ -1,166 +1,183 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using KMCCC.Authentication;
-
-namespace KMCCC.Launcher
+﻿namespace KMCCC.Launcher
 {
+	#region
+
+	using System;
+	using System.Diagnostics;
+	using Authentication;
+
+	#endregion
+
 	/// <summary>
-	/// 启动选项
+	///     启动选项
 	/// </summary>
 	public class LaunchOptions
 	{
 		/// <summary>
-		/// 最大内存
+		///     最大内存
 		/// </summary>
 		public int MaxMemory { get; set; }
 
 		/// <summary>
-		/// 最小内存
+		///     最小内存
 		/// </summary>
 		public int MinMemory { get; set; }
 
 		/// <summary>
-		/// 启动的版本
+		///     启动的版本
 		/// </summary>
 		public Version Version { get; set; }
 
 		/// <summary>
-		/// 使用的验证器
+		///     使用的验证器
 		/// </summary>
 		public IAuthenticator Authenticator { get; set; }
 
 		/// <summary>
-		/// 启动模式
+		///     启动模式
 		/// </summary>
 		public LaunchMode Mode { get; set; }
 
 		/// <summary>
-		/// 直接连接的服务器
+		///     直接连接的服务器
 		/// </summary>
 		public ServerInfo Server { get; set; }
 
 		/// <summary>
-		/// 设置窗口大小
+		///     设置窗口大小
 		/// </summary>
 		public WindowSize Size { get; set; }
 	}
+
 	/// <summary>
-	/// 启动模式
+	///     启动模式
 	/// </summary>
 	public enum LaunchMode
 	{
 		/// <summary>
-		/// 没有认为附加选项（默认）
+		///     没有认为附加选项（默认）
 		/// </summary>
 		Own,
+
 		/// <summary>
-		/// BMCL的启动特点，主目录在{GameRootPath}/
+		///     BMCL的启动特点，主目录在{GameRootPath}/
 		/// </summary>
-		BMCL, 
+		BMCL,
+
 		/// <summary>
-		/// MCLauncher的启动特点，主目录在{GameRootPath}/versions/{version}/
+		///     MCLauncher的启动特点，主目录在{GameRootPath}/versions/{version}/
 		/// </summary>
-		MCLauncher
+		McLauncher
 	}
 
 	/// <summary>
-	/// 启动句柄，基本上也就比较用
+	///     启动句柄，基本上也就比较用
 	/// </summary>
 	public class LaunchHandle
 	{
 		/// <summary>
-		/// 只读的验证信息
+		///     只读的验证信息
 		/// </summary>
-		public readonly AuthenticationInfo info;
+		public readonly AuthenticationInfo Info;
 
-		internal int code;
+		internal int Code;
 
-		internal LauncherCore core;
+		internal LauncherCore Core;
 
-		internal Process process;
+		internal Process Process;
 
 		internal LaunchHandle(AuthenticationInfo info)
 		{
-			this.info = info;
+			Info = info;
 		}
 
-		private void output(object sender, DataReceivedEventArgs e)
+		private void Output(object sender, DataReceivedEventArgs e)
 		{
-			if (e.Data == null) { process.OutputDataReceived -= output; }
+			if (e.Data == null)
+			{
+				Process.OutputDataReceived -= Output;
+			}
 			else
 			{
-				core.log(this, e.Data);
+				Core.Log(this, e.Data);
 			}
 		}
 
-		private void error(object sender, DataReceivedEventArgs e)
+		private void Error(object sender, DataReceivedEventArgs e)
 		{
-			if (e.Data == null) { process.OutputDataReceived -= error; }
+			if (e.Data == null)
+			{
+				Process.OutputDataReceived -= Error;
+			}
 			else
 			{
-				core.log(this, e.Data);
+				Core.Log(this, e.Data);
 			}
 		}
 
-		internal void work()
+		internal void Work()
 		{
-			process.BeginOutputReadLine();
-			process.OutputDataReceived += output;
-			process.BeginErrorReadLine();
-			process.ErrorDataReceived += error;
+			Process.BeginOutputReadLine();
+			Process.OutputDataReceived += Output;
+			Process.BeginErrorReadLine();
+			Process.ErrorDataReceived += Error;
 		}
 	}
 
 	/// <summary>
-	/// 启动异常（未启用）
+	///     启动异常（未启用）
 	/// </summary>
 	public class LaunchException : Exception
 	{
 		/// <summary>
-		/// 异常类型
-		/// </summary>
-		public LaunchExceptionType Type { get; private set; }
-
-		/// <summary>
-		/// 启动异常
+		///     启动异常
 		/// </summary>
 		/// <param name="type">异常类型</param>
 		/// <param name="message">异常信息</param>
-		public LaunchException(LaunchExceptionType type, string message) : base(message) { this.Type = type; }
+		public LaunchException(LaunchExceptionType type, string message) : base(message)
+		{
+			Type = type;
+		}
+
 		/// <summary>
-		/// 启动异常
+		///     启动异常
 		/// </summary>
 		/// <param name="type">异常类型</param>
 		/// <param name="message">异常信息</param>
 		/// <param name="innerException">内部异常</param>
-		public LaunchException(LaunchExceptionType type, string message, Exception innerException) : base(message, innerException) { this.Type = type; }
+		public LaunchException(LaunchExceptionType type, string message, Exception innerException) : base(message, innerException)
+		{
+			Type = type;
+		}
+
+		/// <summary>
+		///     异常类型
+		/// </summary>
+		public LaunchExceptionType Type { get; private set; }
 	}
 
 	/// <summary>
-	/// 异常类型
+	///     异常类型
 	/// </summary>
 	public enum LaunchExceptionType
 	{
 		/// <summary>
-		/// 验证器错误
+		///     验证器错误
 		/// </summary>
-		Authenticator, 
+		Authenticator,
+
 		/// <summary>
-		/// 启动参数操作器错误
+		///     启动参数操作器错误
 		/// </summary>
-		ArguementsOperator, 
+		ArguementsOperator,
+
 		/// <summary>
-		/// 启动时错误
+		///     启动时错误
 		/// </summary>
-		LaunchTime, 
+		LaunchTime,
+
 		/// <summary>
-		/// 未知
+		///     未知
 		/// </summary>
 		Unknow
 	}
