@@ -29,14 +29,14 @@
 			if (reg == null)
 				yield break;
 			foreach (var str in 
-				from ver in reg.GetSubKeyNames()
-				select reg.OpenSubKey(ver)
-				into command
-				where command != null
-				select command.GetValue("JavaHome").ToString()
-				into str
-				where !String.IsNullOrWhiteSpace(str)
-				select str)
+				(from ver in reg.GetSubKeyNames()
+					select reg.OpenSubKey(ver)
+					into command
+					where command != null
+					select command.GetValue("JavaHome").ToString()
+					into str
+					where !String.IsNullOrWhiteSpace(str)
+					select str).Distinct())
 			{
 				yield return str + @"\bin\javaw.exe";
 			}
