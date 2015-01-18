@@ -34,7 +34,7 @@
 				args.MainClass = options.Version.MainClass;
 				args.MaxMemory = options.MaxMemory;
 				args.MinMemory = options.MinMemory;
-				args.NativePath = GameRootPath + @"\$natvies-" + Guid.NewGuid();
+				args.NativePath = GameRootPath + @"\$natives";
 				foreach (var native in options.Version.Natives)
 				{
 					try
@@ -55,8 +55,9 @@
 				args.Server = options.Server;
 				args.Size = options.Size;
 				args.Libraries = options.Version.Libraries.Select(this.GetLibPath).ToList();
-				args.Libraries.Add(this.GetVersionJarPath(options.Version));
+				args.Libraries.Add(this.GetVersionJarPath(options.Version.JarId));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
+
 				args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
@@ -68,17 +69,14 @@
 				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
 				args.Tokens.Add("user_properties", authentication.Properties);
 				args.Tokens.Add("user_type", authentication.UserType);
+
 				args.AdvencedArguments = new List<string> {"-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true"};
+
 				args.Authentication = authentication;
 				args.Version = options.Version;
-				switch (options.Mode)
+				if (options.Mode != null)
 				{
-					case LaunchMode.BMCL:
-						Bmclmode(args);
-						break;
-					case LaunchMode.McLauncher:
-						McLaunchermode(args);
-						break;
+					options.Mode.Operate(this, args);
 				}
 				return null;
 			}
@@ -88,25 +86,13 @@
 			}
 		}
 
-		private void Bmclmode(MinecraftLaunchArguments args)
+		public void CopyVersionDirectory(string directoryName, string versionId)
 		{
-			OperateDirectory("mods", args.Version.Id);
-			OperateDirectory("coremods", args.Version.Id);
-			OperateDirectories(this.GetVersionRootPath(args.Version));
+			CopyDirectory(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, directoryName, versionId),
+				String.Format(@"{0}\{1}", GameRootPath, directoryName));
 		}
 
-		private static void McLaunchermode(MinecraftLaunchArguments args)
-		{
-			args.Tokens["game_directory"] = String.Format(@".\versions\{0}\", args.Version.Id);
-		}
-
-		private void OperateDirectory(string name, string ver)
-		{
-			OperateDirectoryInternal(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, name, ver),
-				String.Format(@"{0}\{1}", GameRootPath, name));
-		}
-
-		private void OperateDirectoryInternal(string source, string target)
+		public void CopyDirectory(string source, string target)
 		{
 			var code = CurrentCode;
 			if (!Directory.Exists(source)) return;
@@ -129,7 +115,7 @@
 			GameExit += handler;
 		}
 
-		private void OperateDirectories(string ver)
+		public void CopyVersionDirectories(string ver)
 		{
 			var root = String.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
 			if (!Directory.Exists(root))
@@ -138,7 +124,7 @@
 			}
 			foreach (var dir in new DirectoryInfo(root).EnumerateDirectories())
 			{
-				OperateDirectoryInternal(dir.FullName, String.Format(@"{0}\{1}", GameRootPath, dir.Name));
+				CopyDirectory(dir.FullName, String.Format(@"{0}\{1}", GameRootPath, dir.Name));
 			}
 		}
 
@@ -173,11 +159,7 @@
 				};
 				handle.Process = Process.Start(psi);
 				handle.Work();
-				Task.Factory.StartNew(handle.Process.WaitForExit).ContinueWith(t =>
-				{
-					Directory.Delete(args.NativePath, true);
-					Exit(handle, handle.Process.ExitCode);
-				});
+				Task.Factory.StartNew(handle.Process.WaitForExit).ContinueWith(t => Exit(handle, handle.Process.ExitCode));
 				return new LaunchResult {Success = true, Handle = handle};
 			}
 			catch (Exception exp)
@@ -189,14 +171,16 @@
 
 	public static class LaunchHandleExtensions
 	{
-		public static void SetTitle(this LaunchHandle handle, string title)
+		public static bool SetTitle(this LaunchHandle handle, string title)
 		{
 			try
 			{
 				SetWindowText(handle.Process.MainWindowHandle, title);
+				return true;
 			}
 			catch
 			{
+				return false;
 			}
 		}
 

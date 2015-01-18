@@ -33,8 +33,8 @@
 						Version = core.GetVersion("****"),
 						Authenticator = new OfflineAuthenticator("KBlackcn"),
 						//Authenticator = new YggdrasilLogin("****@****", "****", true),
-						Server = new ServerInfo {Address = "mc.hypixel.net"},
-						Mode = LaunchMode.Own,
+						//Server = new ServerInfo {Address = "mc.hypixel.net"},
+						Mode = null,
 						MaxMemory = 2048,
 						MinMemory = 1024,
 						Size = new WindowSize {Height = 768, Width = 1280}
@@ -52,6 +52,7 @@
 						return;
 					}
 					Are.WaitOne();
+					Console.WriteLine("游戏已关闭");
 					Console.ReadKey();
 				}
 			}

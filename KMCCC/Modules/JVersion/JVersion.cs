@@ -39,6 +39,12 @@
 
 		[JsonPropertyName("assets")]
 		public string Assets { get; set; }
+
+		[JsonPropertyName("inheritsFrom")]
+		public string InheritsVersion { get; set; }
+
+		[JsonPropertyName("jar")]
+		public string JarId { get; set; }
 	}
 
 	public class JLibrary

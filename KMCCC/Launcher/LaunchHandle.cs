@@ -50,27 +50,6 @@
 	}
 
 	/// <summary>
-	///     启动模式
-	/// </summary>
-	public enum LaunchMode
-	{
-		/// <summary>
-		///     没有认为附加选项（默认）
-		/// </summary>
-		Own,
-
-		/// <summary>
-		///     BMCL的启动特点，主目录在{GameRootPath}/
-		/// </summary>
-		BMCL,
-
-		/// <summary>
-		///     MCLauncher的启动特点，主目录在{GameRootPath}/versions/{version}/
-		/// </summary>
-		McLauncher
-	}
-
-	/// <summary>
 	///     启动句柄，基本上也就比较用
 	/// </summary>
 	public class LaunchHandle

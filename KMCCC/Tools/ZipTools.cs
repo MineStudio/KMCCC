@@ -9,7 +9,6 @@
 	using System.IO.Packaging;
 	using System.Linq;
 	using System.Reflection;
-	using System.Text;
 
 	#endregion
 

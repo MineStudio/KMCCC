@@ -2,14 +2,12 @@
 {
 	#region
 
-	using System;
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
 	using Launcher;
 	using LitJson;
 	using Tools;
-	using Version = Launcher.Version;
 
 	#endregion
 
@@ -18,34 +16,46 @@
 	/// </summary>
 	public class JVersionLocator : IVersionLocator
 	{
+		private readonly HashSet<string> _locatingVersion;
+
+		private readonly Dictionary<string, Version> _versions;
+
+		public JVersionLocator()
+		{
+			_versions = new Dictionary<string, Version>();
+			_locatingVersion = new HashSet<string>();
+		}
+
 		public string GameRootPath { get; set; }
+
+		private LauncherCore _core;
 
 		public LauncherCore Core
 		{
-			set { GameRootPath = value.GameRootPath; }
+			set
+			{
+				GameRootPath = value.GameRootPath;
+				_core = value;
+			}
 		}
 
 		public Version Locate(string id)
 		{
-			var versionPath = GameRootPath + @"\versions\" + id;
-			if (!Directory.Exists(versionPath))
+			lock (_locatingVersion)
 			{
-				return null;
+				return GetVersionInternal(id);
 			}
-			versionPath = versionPath + '\\' + id + ".json";
-			return File.Exists(versionPath)
-				? GetVersionInternal(versionPath)
-				: null;
 		}
 
 		public IEnumerable<Version> GetAllVersions()
 		{
 			try
 			{
-				return
-					new DirectoryInfo(GameRootPath + @"\versions\").EnumerateDirectories()
-						.Select(directory => Locate(directory.Name))
-						.Where(ver => ver != null);
+				lock (_locatingVersion)
+				{
+					return new DirectoryInfo(GameRootPath + @"\versions").EnumerateDirectories()
+						.Select(dir => GetVersionInternal(dir.Name)).Where(item => item != null);
+				}
 			}
 			catch
 			{
@@ -56,28 +66,44 @@
 		/// <summary>
 		///     获取Version信息，当出现错误时会返回null
 		/// </summary>
-		/// <param name="jsonPath">json文件的位置</param>
+		/// <param name="id">版本id</param>
 		/// <returns>Version的信息</returns>
-		internal Version GetVersionInternal(string jsonPath)
+		internal Version GetVersionInternal(string id)
 		{
 			try
 			{
-				var ver = new Version();
-				var json = File.ReadAllText(jsonPath);
-				var jver = JsonMapper.ToObject<JVersion>(json);
-				if (String.IsNullOrWhiteSpace(jver.Id))
+				if (_locatingVersion.Contains(id))
 				{
 					return null;
 				}
-				if (String.IsNullOrWhiteSpace(jver.MinecraftArguments))
+				_locatingVersion.Add(id);
+
+				Version version;
+				if (_versions.TryGetValue(id, out version))
+				{
+					return version;
+				}
+
+				var jver = LoadVersion(_core.GetVersionJsonPath(id));
+				if (jver == null)
 				{
 					return null;
 				}
-				if (String.IsNullOrWhiteSpace(jver.MainClass))
+
+				version = new Version();
+				if (string.IsNullOrWhiteSpace(jver.Id))
 				{
 					return null;
 				}
-				if (String.IsNullOrWhiteSpace(jver.Assets))
+				if (string.IsNullOrWhiteSpace(jver.MinecraftArguments))
+				{
+					return null;
+				}
+				if (string.IsNullOrWhiteSpace(jver.MainClass))
+				{
+					return null;
+				}
+				if (string.IsNullOrWhiteSpace(jver.Assets))
 				{
 					jver.Assets = "legacy";
 				}
@@ -85,15 +111,16 @@
 				{
 					return null;
 				}
-				ver.Id = jver.Id;
-				ver.MinecraftArguments = jver.MinecraftArguments;
-				ver.Assets = jver.Assets;
-				ver.MainClass = jver.MainClass;
-				ver.Libraries = new List<Library>();
-				ver.Natives = new List<Native>();
+				version.Id = jver.Id;
+				version.MinecraftArguments = jver.MinecraftArguments;
+				version.Assets = jver.Assets;
+				version.MainClass = jver.MainClass;
+				version.JarId = jver.JarId;
+				version.Libraries = new List<Library>();
+				version.Natives = new List<Native>();
 				foreach (var lib in jver.Libraries)
 				{
-					if (String.IsNullOrWhiteSpace(lib.Name))
+					if (string.IsNullOrWhiteSpace(lib.Name))
 					{
 						continue;
 					}
@@ -108,7 +135,7 @@
 						{
 							continue;
 						}
-						ver.Libraries.Add(new Library
+						version.Libraries.Add(new Library
 						{
 							NS = names[0],
 							Name = names[1],
@@ -128,14 +155,48 @@
 							Version = names[2],
 							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch())
 						};
-						ver.Natives.Add(native);
+						version.Natives.Add(native);
 						if (lib.Extract != null)
 						{
 							native.Options = new UnzipOptions {Exclude = lib.Extract.Exculde};
 						}
 					}
 				}
-				return ver;
+				if (jver.InheritsVersion != null)
+				{
+					var target = GetVersionInternal(jver.InheritsVersion);
+					if (target == null)
+					{
+						return null;
+					}
+					else
+					{
+						version.Assets = version.Assets ?? target.Assets;
+						version.JarId = version.JarId ?? target.JarId;
+						version.MainClass = version.MainClass ?? target.MainClass;
+						version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
+						version.Natives.AddRange(target.Natives);
+						version.Libraries.AddRange(target.Libraries);
+					}
+				}
+				_versions.Add(version.Id, version);
+				return version;
+			}
+			catch
+			{
+				return null;
+			}
+			finally
+			{
+				_locatingVersion.Remove(id);
+			}
+		}
+
+		public JVersion LoadVersion(string jsonPath)
+		{
+			try
+			{
+				return JsonMapper.ToObject<JVersion>(File.ReadAllText(jsonPath));
 			}
 			catch
 			{
@@ -143,13 +204,12 @@
 			}
 		}
 
-
 		/// <summary>
 		///     判断一系列规则后是否启用
 		/// </summary>
 		/// <param name="rules">规则们</param>
 		/// <returns>是否启用</returns>
-		public Boolean IfAllowed(List<JRule> rules)
+		public bool IfAllowed(List<JRule> rules)
 		{
 			if (rules == null)
 			{

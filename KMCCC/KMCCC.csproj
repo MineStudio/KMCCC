@@ -47,6 +47,7 @@
     <Compile Include="Authentication\OfflineAuthenticator.cs" />
     <Compile Include="Authentication\WarpedAuhenticator.cs" />
     <Compile Include="Authentication\Yggdrasil.cs" />
+    <Compile Include="Launcher\LaunchMode.cs" />
     <Compile Include="Launcher\LaunchHandle.cs" />
     <Compile Include="Launcher\LauncherCore.cs" />
     <Compile Include="Launcher\LauncherCoreInternal.cs" />

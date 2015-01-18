@@ -35,7 +35,7 @@
 	/// <summary>
 	///     表示版本
 	/// </summary>
-	public class Version
+	public sealed class Version
 	{
 		/// <summary>
 		///     ID
@@ -66,6 +66,11 @@
 		///     本地实现表
 		/// </summary>
 		public List<Native> Natives { get; set; }
+
+		/// <summary>
+		///     Jar文件（Id）
+		/// </summary>
+		public string JarId { get; set; }
 	}
 
 	/// <summary>
@@ -125,19 +130,35 @@
 	/// </summary>
 	public static class LauncherCoreItemResolverExtensions
 	{
+
 		public static string GetVersionRootPath(this LauncherCore core, Version version)
 		{
-			return String.Format(@"{0}\versions\{1}\", core.GameRootPath, version.Id);
+			return GetVersionRootPath(core, version.Id);
+		}
+
+		public static string GetVersionRootPath(this LauncherCore core, string versionId)
+		{
+			return String.Format(@"{0}\versions\{1}\", core.GameRootPath, versionId);
 		}
 
 		public static string GetVersionJarPath(this LauncherCore core, Version version)
 		{
-			return String.Format(@"{0}\versions\{1}\{1}.jar", core.GameRootPath, version.Id);
+			return GetVersionJarPath(core, version.Id);
+		}
+
+		public static string GetVersionJarPath(this LauncherCore core, string versionId)
+		{
+			return String.Format(@"{0}\versions\{1}\{1}.jar", core.GameRootPath, versionId);
 		}
 
 		public static string GetVersionJsonPath(this LauncherCore core, Version version)
 		{
-			return String.Format(@"{0}\versions\{1}\{1}.json", core.GameRootPath, version.Id);
+			return GetVersionJsonPath(core, version.Id);
+		}
+
+		public static string GetVersionJsonPath(this LauncherCore core, string versionId)
+		{
+			return String.Format(@"{0}\versions\{1}\{1}.json", core.GameRootPath, versionId);
 		}
 
 		public static string GetLibPath(this LauncherCore core, Library lib)
