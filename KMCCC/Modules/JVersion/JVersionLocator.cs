@@ -179,6 +179,7 @@
 						version.Libraries.AddRange(target.Libraries);
 					}
 				}
+				version.JarId = version.JarId ?? version.Id;
 				_versions.Add(version.Id, version);
 				return version;
 			}
