@@ -89,7 +89,7 @@
 
 		public static LauncherCore Create(string gameRootPath = null)
 		{
-			return Create(new LauncherCoreCreationOption(new DirectoryInfo(gameRootPath ?? @".minecraft").FullName));
+			return Create(new LauncherCoreCreationOption(gameRootPath ?? @".minecraft"));
 		}
 
 		/// <summary>
@@ -162,7 +162,7 @@
 		/// <param name="versionLocator">Version定位器，默认为 JVersionLoacator</param>
 		public LauncherCoreCreationOption(string gameRootPath = null, string javaPath = null, IVersionLocator versionLocator = null)
 		{
-			GameRootPath = gameRootPath ?? ".minecraft";
+			GameRootPath = new DirectoryInfo(gameRootPath ?? ".minecraft").FullName;
 			JavaPath = javaPath ?? SystemTools.FindJava().FirstOrDefault();
 			VersionLocator = versionLocator ?? new JVersionLocator();
 			if (!Directory.Exists(GameRootPath))
