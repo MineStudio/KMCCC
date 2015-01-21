@@ -18,12 +18,37 @@
 		/// <returns>JAVA地址列表</returns>
 		public static IEnumerable<string> FindJava()
 		{
-			var reg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
-			if (reg == null)
+			var rootReg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
+			if (rootReg == null)
 			{
 				yield break;
 			}
+			var reg = rootReg;
+
 			var registryKey = reg.OpenSubKey("JavaSoft");
+			if (registryKey != null)
+				reg = registryKey.OpenSubKey("Java Runtime Environment");
+			if (reg == null)
+				yield break;
+			foreach (var str in
+				(from ver in reg.GetSubKeyNames()
+				 select reg.OpenSubKey(ver)
+					 into command
+					 where command != null
+					 select command.GetValue("JavaHome")
+						 into javaHomes
+						 where javaHomes != null
+						 select javaHomes.ToString()
+							 into str
+							 where !String.IsNullOrWhiteSpace(str)
+							 select str).Distinct())
+			{
+				yield return str + @"\bin\javaw.exe";
+			}
+
+			reg = rootReg.OpenSubKey("Wow6432Node");
+			if (reg == null) yield break;
+			registryKey = reg.OpenSubKey("JavaSoft");
 			if (registryKey != null)
 				reg = registryKey.OpenSubKey("Java Runtime Environment");
 			if (reg == null)
