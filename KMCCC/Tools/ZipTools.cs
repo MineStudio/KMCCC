@@ -83,7 +83,7 @@
 				var rootPath = root.FullName + "/";
 				var zip = ZipArchive_OpenOnFile.Invoke(null, new object[] {zipFile, FileMode.Open, FileAccess.Read, FileShare.Read, false});
 				var ioManager = ZipArchive_ZipIOBlockManager.GetValue(zip);
-				ZipIOBlockManager_Encoding.SetValue(ioManager, new WarpedEncoding());
+				ZipIOBlockManager_Encoding.SetValue(ioManager, options.Encoding ?? Encoding.Default);
 				var files = (IEnumerable) ZipArchive_GetFiles.Invoke(zip, new object[] {});
 				IEnumerable<string> exclude = (options.Exclude ?? new List<string>());
 				if (exclude.Count() > 1000)
@@ -201,5 +201,7 @@
 	public class UnzipOptions
 	{
 		public List<string> Exclude { get; set; }
+
+		public Encoding Encoding { get; set; }
 	}
 }
