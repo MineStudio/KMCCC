@@ -37,20 +37,18 @@
 				args.NativePath = GameRootPath + @"\$natives";
 				foreach (var native in options.Version.Natives)
 				{
-					try
+					var exp = ZipTools.UnzipFile(this.GetNativePath(native), args.NativePath, native.Options);
+					if (exp == null)
 					{
-						ZipTools.Unzip(this.GetNativePath(native), args.NativePath, native.Options);
+						continue;
 					}
-					catch (Exception exp)
+					return new LaunchResult
 					{
-						return new LaunchResult
-						{
-							Success = false,
-							ErrorType = ErrorType.UncompressingFailed,
-							ErrorMessage = string.Format("解压错误: {0}:{1}:{2}", native.NS, native.Name, native.Version),
-							Exception = exp
-						};
-					}
+						Success = false,
+						ErrorType = ErrorType.UncompressingFailed,
+						ErrorMessage = string.Format("解压错误: {0}:{1}:{2}", native.NS, native.Name, native.Version),
+						Exception = exp
+					};
 				}
 				args.Server = options.Server;
 				args.Size = options.Size;
@@ -144,20 +142,58 @@
 			}
 		}
 
-		private LaunchResult LaunchInternal(MinecraftLaunchArguments args)
+		internal LaunchResult LaunchInternal(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
+		{
+			lock (Locker)
+			{
+				if (!File.Exists(JavaPath))
+				{
+					return new LaunchResult { Success = false, ErrorType = ErrorType.NoJAVA, ErrorMessage = "指定的JAVA位置不存在" };
+				}
+				CurrentCode = Random.Next();
+				var args = new MinecraftLaunchArguments();
+				var result = GenerateArguments(options, ref args);
+				if (result != null)
+				{
+					return result;
+				}
+				if (argumentsOperators == null) return LaunchGame(args);
+				foreach (var opt in argumentsOperators)
+				{
+					try
+					{
+						if (opt != null)
+						{
+							opt(args);
+						}
+					}
+					catch (Exception exp)
+					{
+						return new LaunchResult { Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp };
+					}
+				}
+				return LaunchGame(args);
+			}
+		}
+
+		private LaunchResult LaunchGame(MinecraftLaunchArguments args)
 		{
 			try
 			{
-				var handle = new LaunchHandle(args.Authentication) {Code = CurrentCode, Core = this};
-				var psi = new ProcessStartInfo(JavaPath)
+				var handle = new LaunchHandle(args.Authentication)
 				{
-					Arguments = args.ToArguments(),
-					UseShellExecute = false,
-					WorkingDirectory = GameRootPath,
-					RedirectStandardError = true,
-					RedirectStandardOutput = true
+					Code = CurrentCode,
+					Core = this,
+					Arguments = args,
+					Process = Process.Start(new ProcessStartInfo(JavaPath)
+					{
+						Arguments = args.ToArguments(),
+						UseShellExecute = false,
+						WorkingDirectory = GameRootPath,
+						RedirectStandardError = true,
+						RedirectStandardOutput = true
+					})
 				};
-				handle.Process = Process.Start(psi);
 				handle.Work();
 				Task.Factory.StartNew(handle.Process.WaitForExit).ContinueWith(t => Exit(handle, handle.Process.ExitCode));
 				return new LaunchResult {Success = true, Handle = handle};
@@ -167,24 +203,5 @@
 				return new LaunchResult {Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "启动时出现了异常", Exception = exp};
 			}
 		}
-	}
-
-	public static class LaunchHandleExtensions
-	{
-		public static bool SetTitle(this LaunchHandle handle, string title)
-		{
-			try
-			{
-				SetWindowText(handle.Process.MainWindowHandle, title);
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
-		[DllImport("User32.dll")]
-		public static extern int SetWindowText(IntPtr winHandle, string title);
 	}
 }

@@ -40,5 +40,13 @@
 				Dircopy(subdir.FullName, target + "\\" + subdir.Name);
 			}
 		}
+
+#if DEBUG
+		public static string Print(this string str)
+		{
+			Console.WriteLine(str);
+			return str;
+		}
+#endif
 	}
 }

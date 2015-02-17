@@ -105,36 +105,7 @@
 		/// <returns>启动结果</returns>
 		public LaunchResult Launch(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{
-			lock (Locker)
-			{
-				if (!File.Exists(JavaPath))
-				{
-					return new LaunchResult {Success = false, ErrorType = ErrorType.NoJAVA, ErrorMessage = "指定的JAVA位置不存在"};
-				}
-				CurrentCode = Random.Next();
-				var args = new MinecraftLaunchArguments();
-				var result = GenerateArguments(options, ref args);
-				if (result != null)
-				{
-					return result;
-				}
-				if (argumentsOperators == null) return LaunchInternal(args);
-				foreach (var opt in argumentsOperators)
-				{
-					try
-					{
-						if (opt != null)
-						{
-							opt(args);
-						}
-					}
-					catch (Exception exp)
-					{
-						return new LaunchResult {Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp};
-					}
-				}
-				return LaunchInternal(args);
-			}
+			return (LaunchInternal(options, argumentsOperators)); //.Report());
 		}
 
 		/// <summary>

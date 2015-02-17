@@ -6,6 +6,7 @@
 	using System.Collections.Generic;
 	using System.Net;
 	using System.Text;
+	using System.Threading.Tasks;
 	using LitJson;
 
 	#endregion
@@ -49,15 +50,14 @@
 				try
 				{
 					var wc = new WebClient();
-					var request = new AuthenticationRequest
+					var requestBody = JsonMapper.ToJson(new AuthenticationRequest
 					{
 						Agent = Agent.Minecraft,
 						Email = email,
 						Password = password,
 						RequestUser = twitchEnabled,
 						ClientToken = ClientToken.ToString()
-					};
-					var requestBody = JsonMapper.ToJson(request);
+					});
 					var responseBody = wc.UploadString(new Uri(Auth_Authentication), requestBody);
 					var response = JsonMapper.ToObject<AuthenticationResponse>(responseBody);
 					if (response.AccessToken == null)

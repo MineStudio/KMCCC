@@ -11,7 +11,7 @@
 	/// <summary>
 	///     启动选项
 	/// </summary>
-	public class LaunchOptions
+	public sealed class LaunchOptions
 	{
 		/// <summary>
 		///     最大内存
@@ -52,7 +52,7 @@
 	/// <summary>
 	///     启动句柄，基本上也就比较用
 	/// </summary>
-	public class LaunchHandle
+	public sealed class LaunchHandle
 	{
 		/// <summary>
 		///     只读的验证信息
@@ -64,6 +64,8 @@
 		internal LauncherCore Core;
 
 		internal Process Process;
+
+		internal MinecraftLaunchArguments Arguments { get; set; }
 
 		internal LaunchHandle(AuthenticationInfo info)
 		{

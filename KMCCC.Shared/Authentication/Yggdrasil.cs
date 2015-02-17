@@ -51,10 +51,15 @@
 					UserType = client.AccountType,
 					DisplayName = client.DisplayName,
 					Properties = client.Properties,
-					UUID = client.UUID
+					UUID = client.UUID,
+					Type = "KMCCC.Yggdrasil"
 				};
 			}
-			return new AuthenticationInfo {Error = "验证错误"};
+			return new AuthenticationInfo
+			{
+				Error = "验证错误",
+				Type = "KMCCC.Yggdrasil"
+			};
 		}
 
 		public Task<AuthenticationInfo> DoAsync()

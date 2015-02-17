@@ -15,7 +15,6 @@
 
 	/// <summary>
 	///     操蛋的通过反射调用Zip解压
-	///     Notice: 文件名只支持ASCII
 	/// </summary>
 	public static class ZipTools
 	{
@@ -26,8 +25,6 @@
 		public static readonly MethodInfo ZipArchive_OpenOnFile;
 
 		public static readonly MethodInfo ZipArchive_GetFiles;
-
-		public static readonly MethodInfo ZipArchive_Close;
 
 		public static readonly FieldInfo ZipArchive_ZipIOBlockManager;
 
@@ -51,7 +48,6 @@
 				ZipArchive = windowsBase.GetType("MS.Internal.IO.Zip.ZipArchive");
 				ZipArchive_OpenOnFile = ZipArchive.GetMethod("OpenOnFile", BindingFlags.NonPublic | BindingFlags.Static);
 				ZipArchive_GetFiles = ZipArchive.GetMethod("GetFiles", BindingFlags.NonPublic | BindingFlags.Instance);
-				ZipArchive_Close = ZipArchive.GetMethod("Close", BindingFlags.NonPublic | BindingFlags.Instance);
 				ZipArchive_ZipIOBlockManager = ZipArchive.GetField("_blockManager", BindingFlags.NonPublic | BindingFlags.Instance);
 
 				ZipFileInfo = windowsBase.GetType("MS.Internal.IO.Zip.ZipFileInfo");
@@ -72,53 +68,58 @@
 
 		public static bool Unzip(string zipFile, string outputDirectory, UnzipOptions options)
 		{
-			if (options == null)
-			{
-				return false;
-			}
+			return UnzipFile(zipFile, outputDirectory, options) == null;
+		}
+
+		public static Exception UnzipFile(string zipFile, string outputDirectory, UnzipOptions options)
+		{
+			options = options ?? new UnzipOptions();
 			try
 			{
 				var root = new DirectoryInfo(outputDirectory);
 				root.Create();
 				var rootPath = root.FullName + "/";
-				var zip = ZipArchive_OpenOnFile.Invoke(null, new object[] {zipFile, FileMode.Open, FileAccess.Read, FileShare.Read, false});
-				var ioManager = ZipArchive_ZipIOBlockManager.GetValue(zip);
-				ZipIOBlockManager_Encoding.SetValue(ioManager, new WarpedEncoding(options.Encoding ?? Encoding.Default));
-				var files = (IEnumerable) ZipArchive_GetFiles.Invoke(zip, new object[] {});
-				IEnumerable<string> exclude = (options.Exclude ?? new List<string>());
-				if (exclude.Count() > 1000)
+				using (var zip = (IDisposable) ZipArchive_OpenOnFile.Invoke(null, new object[] {zipFile, FileMode.Open, FileAccess.Read, FileShare.Read, false}))
 				{
-					exclude = exclude.AsParallel();
-				}
-				foreach (var item in files)
-				{
-					var name = (string) ZipFileInfo_Name.GetValue(item, null);
-					if (exclude.Any(name.StartsWith))
+					var ioManager = ZipArchive_ZipIOBlockManager.GetValue(zip);
+					ZipIOBlockManager_Encoding.SetValue(ioManager, new WarpedEncoding(options.Encoding ?? Encoding.Default));
+
+					var files = (IEnumerable) ZipArchive_GetFiles.Invoke(zip, new object[] {});
+					IEnumerable<string> exclude = (options.Exclude ?? new List<string>());
+					if (exclude.Count() > 1000)
 					{
-						continue;
+						exclude = exclude.AsParallel();
 					}
-					if ((bool) ZipFileInfo_FolderFlag.GetValue(item, null))
+
+					foreach (var item in files)
 					{
-						Directory.CreateDirectory(rootPath + name);
-						continue;
-					}
-					using (var stream = (Stream) ZipFileInfo_GetStream.Invoke(item, new object[] {FileMode.Open, FileAccess.Read}))
-					{
-						var filePath = rootPath + name;
-						var directoryInfo = new FileInfo(filePath).Directory;
-						if (directoryInfo != null) directoryInfo.Create();
-						using (var fs = new FileStream(filePath, FileMode.Create))
+						var name = (string) ZipFileInfo_Name.GetValue(item, null);
+						if (exclude.Any(name.StartsWith))
 						{
-							stream.CopyTo(fs);
+							continue;
+						}
+						if ((bool) ZipFileInfo_FolderFlag.GetValue(item, null))
+						{
+							Directory.CreateDirectory(rootPath + name);
+							continue;
+						}
+						using (var stream = (Stream) ZipFileInfo_GetStream.Invoke(item, new object[] {FileMode.Open, FileAccess.Read}))
+						{
+							var filePath = rootPath + name;
+							var directoryInfo = new FileInfo(filePath).Directory;
+							if (directoryInfo != null) directoryInfo.Create();
+							using (var fs = new FileStream(filePath, FileMode.Create))
+							{
+								stream.CopyTo(fs);
+							}
 						}
 					}
 				}
-				ZipArchive_Close.Invoke(zip, new object[] {});
-				return true;
+				return null;
 			}
-			catch
+			catch (Exception exp)
 			{
-				return false;
+				return exp;
 			}
 		}
 
@@ -203,10 +204,19 @@
 		}
 	}
 
+	/// <summary>
+	///     解压选项
+	/// </summary>
 	public class UnzipOptions
 	{
+		/// <summary>
+		///     排除的文件（夹）
+		/// </summary>
 		public List<string> Exclude { get; set; }
 
+		/// <summary>
+		///     文件（夹）名使用的编码
+		/// </summary>
 		public Encoding Encoding { get; set; }
 	}
 }

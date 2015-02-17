@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>564f0af1-50e3-4ab4-a3b1-9a73882c3f3b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>KMCCC</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Authentication\AuthenticationInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Authentication\IAuthenticator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Authentication\OfflineAuthenticator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Authentication\WarpedAuhenticator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Authentication\Yggdrasil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\LaunchArguments.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\LauncherCore.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\LauncherCoreInternal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\LaunchHandle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\LaunchHandleExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\LaunchMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\Reporter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Launcher\Version.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\IJsonWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\JsonData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\JsonException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\JsonMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\JsonMockWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\JsonPropertyName.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\JsonReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\JsonWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\Lexer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LitJson\ParserToken.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modules\JVersion\JVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modules\JVersion\JVersionLocator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modules\Yggdrasil\YggdrasilClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\SystemTools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\UsefulTools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\ZipTools.cs" />
+  </ItemGroup>
+</Project>

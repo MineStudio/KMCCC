@@ -1,26 +1,39 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KMCCC", "KMCCC\KMCCC.csproj", "{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KMCCC.Simple", "KMCCC.Simple\KMCCC.Simple.csproj", "{E01C5429-D887-45BB-91D6-AEACD8EEEF1D}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "KMCCC.Shared", "KMCCC.Shared\KMCCC.Shared.shproj", "{564F0AF1-50E3-4AB4-A3B1-9A73882C3F3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KMCCC.Basic", "KMCCC.Basic\KMCCC.Basic.csproj", "{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KMCCC.Pro", "KMCCC.Pro\KMCCC.Pro.csproj", "{4270E717-21EE-46CF-A55A-B8AF33BBCB54}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		KMCCC.Shared\KMCCC.Shared.projitems*{564f0af1-50e3-4ab4-a3b1-9a73882c3f3b}*SharedItemsImports = 13
+		KMCCC.Shared\KMCCC.Shared.projitems*{4270e717-21ee-46cf-a55a-b8af33bbcb54}*SharedItemsImports = 4
+		KMCCC.Shared\KMCCC.Shared.projitems*{2b35c1fd-5e62-416e-b125-7577ef8ba1fb}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E01C5429-D887-45BB-91D6-AEACD8EEEF1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E01C5429-D887-45BB-91D6-AEACD8EEEF1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E01C5429-D887-45BB-91D6-AEACD8EEEF1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E01C5429-D887-45BB-91D6-AEACD8EEEF1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B35C1FD-5E62-416E-B125-7577EF8BA1FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4270E717-21EE-46CF-A55A-B8AF33BBCB54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4270E717-21EE-46CF-A55A-B8AF33BBCB54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4270E717-21EE-46CF-A55A-B8AF33BBCB54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4270E717-21EE-46CF-A55A-B8AF33BBCB54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

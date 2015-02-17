@@ -31,11 +31,19 @@
 		{
 			if (String.IsNullOrWhiteSpace(DisplayName))
 			{
-				return new AuthenticationInfo {Error = "DisplayName不符合规范"};
+				return new AuthenticationInfo
+				{
+					Error = "DisplayName不符合规范",
+					Type = "KMCCC.Offline"
+				};
 			}
 			if (DisplayName.Count(char.IsWhiteSpace) > 0)
 			{
-				return new AuthenticationInfo {Error = "DisplayName不符合规范"};
+				return new AuthenticationInfo
+				{
+					Error = "DisplayName不符合规范",
+					Type = "KMCCC.Offline"
+				};
 			}
 			return new AuthenticationInfo
 			{
@@ -43,7 +51,8 @@
 				DisplayName = DisplayName,
 				UUID = Guid.NewGuid(),
 				Properties = "{}",
-				UserType = "Mojang"
+				UserType = "Mojang",
+				Type = "KMCCC.Offline"
 			};
 		}
 
