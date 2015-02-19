@@ -46,7 +46,7 @@
 		private const string SERVICE_ROOT = @"http://api.kmccc.minestudio.org/v1";
 #endif
 
-		public const string Version = "0.9.5.1";
+		public const string Version = "0.9.5.2";
 
 		private const string LAUNCH_REPORT = SERVICE_ROOT + "/launch";
 
@@ -185,7 +185,7 @@
 				#region KMCCC信息
 
 				LauncherType = KMCCC_TYPE;
-				LauncherVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+				LauncherVersion = Version;
 
 				#endregion
 
