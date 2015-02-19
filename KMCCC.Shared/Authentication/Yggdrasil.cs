@@ -40,6 +40,14 @@
 		/// </summary>
 		public bool TwitchEnabled { get; private set; }
 
+		/// <summary>
+		///     返回Yggdrasil验证器类型
+		/// </summary>
+		public string Type
+		{
+			get { return "KMCCC.Yggdrasil"; }
+		}
+
 		public AuthenticationInfo Do()
 		{
 			var client = new YggdrasilClient();
@@ -51,14 +59,12 @@
 					UserType = client.AccountType,
 					DisplayName = client.DisplayName,
 					Properties = client.Properties,
-					UUID = client.UUID,
-					Type = "KMCCC.Yggdrasil"
+					UUID = client.UUID
 				};
 			}
 			return new AuthenticationInfo
 			{
-				Error = "验证错误",
-				Type = "KMCCC.Yggdrasil"
+				Error = "验证错误"
 			};
 		}
 

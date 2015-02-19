@@ -105,7 +105,7 @@
 		/// <returns>启动结果</returns>
 		public LaunchResult Launch(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{
-			return (LaunchInternal(options, argumentsOperators)); //.Report());
+			return this.Report(LaunchInternal(options, argumentsOperators), options);
 		}
 
 		/// <summary>

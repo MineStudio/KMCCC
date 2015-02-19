@@ -23,6 +23,14 @@
 			_info = info;
 		}
 
+		/// <summary>
+		///     标注包装验证器
+		/// </summary>
+		public string Type
+		{
+			get { return "KMCCCWarped"; }
+		}
+
 		public AuthenticationInfo Do()
 		{
 			return _info;

@@ -46,10 +46,5 @@
 		///     其他验证信息，一边用不着
 		/// </summary>
 		public Dictionary<string, string> AdvancedInfo { get; set; }
-
-		/// <summary>
-		///     验证信息的类型，统计时用到
-		/// </summary>
-		public string Type { get; set; }
 	}
 }

@@ -49,11 +49,16 @@
 
 		private static ReportLevel _reportLevel = ReportLevel.Full;
 
-		private static string _clientName = "(Default) " + KMCCC_TYPE;
+		private static string _clientName;
 
 		public static void SetReportLevel(ReportLevel level)
 		{
 			_reportLevel = level;
+		}
+
+		static Reporter()
+		{
+			_clientName = string.Format("(Default[{0}]) {1}", KMCCC_TYPE, Assembly.GetEntryAssembly().GetName().Name);
 		}
 
 		/// <summary>
@@ -110,8 +115,10 @@
 		/// <summary>
 		///     报告一次启动结果
 		/// </summary>
+		/// <param name="core">启动器核心</param>
 		/// <param name="result">启动结果</param>
-		public static LaunchResult Report(this LaunchResult result)
+		/// <param name="options">启动选项</param>
+		public static LaunchResult Report(this LauncherCore core, LaunchResult result, LaunchOptions options)
 		{
 			if (_reportLevel == ReportLevel.None) return result;
 			Task.Factory.StartNew(() =>
@@ -121,7 +128,9 @@
 					var wc = new WebClient();
 					wc.Headers.Add("user-agent", _clientName);
 					wc.UploadString(LAUNCH_REPORT,
-						JsonMapper.ToJson((_reportLevel == ReportLevel.Full) ? new FullLaunchReport(result) : new BasicLaunchReport(result))
+						JsonMapper.ToJson((_reportLevel == ReportLevel.Full)
+							? new FullLaunchReport(core, result, options)
+							: new BasicLaunchReport(core, result, options))
 #if DEBUG
 							.Print()
 #endif
@@ -168,7 +177,7 @@
 
 			#endregion
 
-			public BasicLaunchReport(LaunchResult result)
+			public BasicLaunchReport(LauncherCore core, LaunchResult result, LaunchOptions options)
 			{
 				#region KMCCC信息
 
@@ -191,8 +200,8 @@
 				#region 启动信息
 
 				LaunchErrorType = result.ErrorType.ToString();
-				JavaPath = result.Handle.Core.JavaPath;
-				AuthenticationType = result.Handle.Info.Type;
+				JavaPath = core.JavaPath;
+				AuthenticationType = options.Authenticator.Type;
 
 				#endregion
 			}
@@ -215,13 +224,16 @@
 
 			#endregion
 
-			public FullLaunchReport(LaunchResult result) : base(result)
+			public FullLaunchReport(LauncherCore core, LaunchResult result, LaunchOptions options) : base(core, result, options)
 			{
-				LaunchedVersionId = result.Handle.Arguments.Version.Id;
-				AutoConnectServer = (result.Handle.Arguments.Server != null) ? result.Handle.Arguments.Server.ToString() : "";
+				LaunchedVersionId = options.Version.Id;
+				AutoConnectServer = (options.Server != null) ? options.Server.ToString() : "";
 				LauncherDirectory = Environment.CurrentDirectory;
-				GameDirectory = result.Handle.Core.GameRootPath;
-				PlayerName = result.Handle.Arguments.Authentication.DisplayName;
+				GameDirectory = core.GameRootPath;
+				if (result.Handle != null)
+				{
+					PlayerName = result.Handle.Arguments.Authentication.DisplayName;
+				}
 			}
 		}
 
