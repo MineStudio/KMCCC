@@ -45,6 +45,9 @@
 #else
 		private const string SERVICE_ROOT = @"http://api.kmccc.minestudio.org/v1";
 #endif
+
+		public const string Version = "0.9.5.1";
+
 		private const string LAUNCH_REPORT = SERVICE_ROOT + "/launch";
 
 		private static ReportLevel _reportLevel = ReportLevel.Full;
