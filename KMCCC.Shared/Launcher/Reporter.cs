@@ -61,7 +61,10 @@
 
 		static Reporter()
 		{
-			_clientName = string.Format("(Default[{0}]) {1}", KMCCC_TYPE, Assembly.GetEntryAssembly().GetName().Name);
+			_clientName = string.Format("Default[{0}] {1} @ {2}",
+				KMCCC_TYPE,
+				Assembly.GetEntryAssembly().GetName().Name,
+				Assembly.GetEntryAssembly().GetName().Version);
 		}
 
 		/// <summary>
@@ -193,7 +196,7 @@
 
 				RuntimeVersion = Environment.Version.ToString();
 				SystemVersion = Environment.OSVersion.VersionString;
-				Memory = ((uint) SystemTools.GetTotalMemory() << 20);
+				Memory = ((uint) (SystemTools.GetTotalMemory() >> 20));
 				Arch = SystemTools.GetArch();
 				VideoCardInfo = GetVideoCardInfo();
 				ProcessorInfo = GetProcessorInfo();
