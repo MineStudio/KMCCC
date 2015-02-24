@@ -33,19 +33,26 @@
 
 		public static IEnumerable<string> FindJavaInternal(RegistryKey registry)
 		{
-			var registryKey = registry.OpenSubKey("JavaSoft");
-			if ((registryKey == null) || ((registry = registryKey.OpenSubKey("Java Runtime Environment")) == null)) return new string[0];
-			return (from ver in registry.GetSubKeyNames()
-				select registry.OpenSubKey(ver)
-				into command
-				where command != null
-				select command.GetValue("JavaHome")
-				into javaHomes
-				where javaHomes != null
-				select javaHomes.ToString()
-				into str
-				where !String.IsNullOrWhiteSpace(str)
-				select str + @"\bin\javaw.exe");
+			try
+			{
+				var registryKey = registry.OpenSubKey("JavaSoft");
+				if ((registryKey == null) || ((registry = registryKey.OpenSubKey("Java Runtime Environment")) == null)) return new string[0];
+				return (from ver in registry.GetSubKeyNames()
+					select registry.OpenSubKey(ver)
+					into command
+					where command != null
+					select command.GetValue("JavaHome")
+					into javaHomes
+					where javaHomes != null
+					select javaHomes.ToString()
+					into str
+					where !String.IsNullOrWhiteSpace(str)
+					select str + @"\bin\javaw.exe");
+			}
+			catch
+			{
+				return new string[0];
+			}
 		}
 
 		/// <summary>
