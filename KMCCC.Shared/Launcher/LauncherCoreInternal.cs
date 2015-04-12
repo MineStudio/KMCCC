@@ -84,6 +84,8 @@
 			}
 		}
 
+		#region 复制文件夹
+
 		public void CopyVersionDirectory(string directoryName, string versionId)
 		{
 			CopyDirectory(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, directoryName, versionId),
@@ -126,6 +128,10 @@
 			}
 		}
 
+		#endregion
+
+		#region 事件
+
 		internal void Log(LaunchHandle handle, string line)
 		{
 			if (GameLog != null)
@@ -141,6 +147,8 @@
 				GameExit(handle, code);
 			}
 		}
+
+		#endregion
 
 		internal LaunchResult LaunchInternal(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{

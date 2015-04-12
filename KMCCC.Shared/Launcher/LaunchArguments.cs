@@ -11,7 +11,7 @@
 	#endregion
 
 	/// <summary>
-	///     启动参数
+	///     Launch Arguments
 	/// </summary>
 	public class MinecraftLaunchArguments
 	{
@@ -162,8 +162,12 @@
 	public class ServerInfo
 	{
 		public string Address { get; set; }
-
 		public ushort Port { get; set; }
+
+		public override string ToString()
+		{
+			return string.Format("{0}:{1}", Address, Port);
+		}
 	}
 
 	public class WindowSize

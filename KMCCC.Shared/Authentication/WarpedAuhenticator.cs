@@ -2,6 +2,7 @@
 {
 	#region
 
+	using System.Threading;
 	using System.Threading.Tasks;
 
 	#endregion
@@ -36,9 +37,9 @@
 			return _info;
 		}
 
-		public Task<AuthenticationInfo> DoAsync()
+		public Task<AuthenticationInfo> DoAsync(CancellationToken token)
 		{
-			return Task<AuthenticationInfo>.Factory.StartNew(() => _info);
+			return Task.Factory.StartNew(() => _info, token);
 		}
 	}
 }

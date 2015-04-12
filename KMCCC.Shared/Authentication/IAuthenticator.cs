@@ -2,6 +2,7 @@
 {
 	#region
 
+	using System.Threading;
 	using System.Threading.Tasks;
 
 	#endregion
@@ -26,6 +27,6 @@
 		///     异步方式调用
 		/// </summary>
 		/// <returns>验证信息</returns>
-		Task<AuthenticationInfo> DoAsync();
+		Task<AuthenticationInfo> DoAsync(CancellationToken token);
 	}
 }

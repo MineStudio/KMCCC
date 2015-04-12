@@ -4,6 +4,7 @@
 
 	using System;
 	using System.Linq;
+	using System.Threading;
 	using System.Threading.Tasks;
 
 	#endregion
@@ -61,9 +62,9 @@
 			};
 		}
 
-		public Task<AuthenticationInfo> DoAsync()
+		public Task<AuthenticationInfo> DoAsync(CancellationToken token)
 		{
-			return Task.Factory.StartNew((Func<AuthenticationInfo>) Do);
+			return Task.Factory.StartNew((Func<AuthenticationInfo>)Do, token);
 		}
 	}
 }

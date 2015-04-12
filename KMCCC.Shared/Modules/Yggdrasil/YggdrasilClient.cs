@@ -6,6 +6,8 @@
 	using System.Collections.Generic;
 	using System.Net;
 	using System.Text;
+	using System.Threading;
+	using System.Threading.Tasks;
 	using LitJson;
 
 	#endregion
@@ -88,6 +90,68 @@
 				{
 					return false;
 				}
+			}
+		}
+
+		public Task<bool> AuthenticateAsync(string email, string password, Boolean twitchEnabled, CancellationToken token)
+		{
+			Clear();
+			var task = new TaskCompletionSource<bool>(token);
+			try
+			{
+				var wc = new WebClient();
+				var requestBody = JsonMapper.ToJson(new AuthenticationRequest
+				{
+					Agent = Agent.Minecraft,
+					Email = email,
+					Password = password,
+					RequestUser = twitchEnabled,
+					ClientToken = ClientToken.ToString()
+				});
+				wc.UploadStringCompleted += (sender, e) =>
+				{
+					try
+					{
+						if (e.Error != null)
+						{
+							task.SetException(e.Error);
+							return;
+						}
+						var response = JsonMapper.ToObject<AuthenticationResponse>(e.Result);
+						if ((response.AccessToken == null) || (response.SelectedProfile == null))
+						{
+							task.SetResult(false);
+							return;
+						}
+						AccessToken = Guid.Parse(response.AccessToken);
+						if (response.User != null)
+						{
+							AccountType = response.User.Legacy ? "Legacy" : "Mojang";
+							if (response.User.Properties != null)
+							{
+								Properties = response.User.Properties.ToJson();
+							}
+						}
+						else
+						{
+							AccountType = "Mojang";
+						}
+						DisplayName = response.SelectedProfile.Name;
+						UUID = Guid.Parse(response.SelectedProfile.Id);
+						task.SetResult(true);
+					}
+					catch (Exception exception)
+					{
+						task.SetException(exception);
+					}
+				};
+				wc.UploadStringAsync(new Uri(Auth_Authentication), requestBody);
+				return task.Task;
+			}
+			catch (Exception exception)
+			{
+				task.SetException(exception);
+				return task.Task;
 			}
 		}
 

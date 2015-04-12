@@ -123,6 +123,8 @@
 			}
 		}
 
+		#region 编码大法
+
 		public class WarpedEncoding : ASCIIEncoding
 		{
 			private readonly Encoding _innerEncoding;
@@ -202,7 +204,10 @@
 				return _innerEncoding.GetString(bytes, index, count);
 			}
 		}
+
+		#endregion
 	}
+
 
 	/// <summary>
 	///     解压选项

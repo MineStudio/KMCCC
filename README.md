@@ -36,7 +36,7 @@ Professional Version of KMCCC
 ### Included:
 
 - Everything in KMCCC.Shared
-- [WIP] Game File Download & Fix (Including Version&Library&Native&Assets)
+- [WIP] Game File Download & Fix & Check (Including Version, Library, Native&Assets)
 - [WIP] More usefull extensions for LaunchHandle
 - [WIP] More usefull libraries that a launch might need.
 
