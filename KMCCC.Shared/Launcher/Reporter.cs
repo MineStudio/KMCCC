@@ -27,17 +27,22 @@
 			/// <summary>
 			///     完整报告
 			/// </summary>
-			Full,
+			Full = 0,
 
 			/// <summary>
 			///     去除可能的敏感信息
 			/// </summary>
-			Basic,
+			Basic = 1,
 
 			/// <summary>
 			///     关闭报告
 			/// </summary>
-			None
+			None = 2,
+
+			/// <summary>
+			///     少到不能再少
+			/// </summary>
+			Min = 3
 		}
 
 #if DEBUG
@@ -110,13 +115,15 @@
 			}
 			catch
 			{
-				return String.Empty;
+				return string.Empty;
 			}
 		}
 
 		#endregion
 
 		#region LaunchReport
+
+		public static bool NoJavaReported;
 
 		/// <summary>
 		///     报告一次启动结果
@@ -127,6 +134,14 @@
 		public static LaunchResult Report(this LauncherCore core, LaunchResult result, LaunchOptions options)
 		{
 			if (_reportLevel == ReportLevel.None) return result;
+			if (result.ErrorType == ErrorType.NoJAVA)
+			{
+				if (NoJavaReported)
+				{
+					return result;
+				}
+				NoJavaReported = true;
+			}
 			Task.Factory.StartNew(() =>
 			{
 				try
@@ -136,7 +151,9 @@
 					wc.UploadString(LAUNCH_REPORT,
 						JsonMapper.ToJson((_reportLevel == ReportLevel.Full)
 							? new FullLaunchReport(core, result, options)
-							: new BasicLaunchReport(core, result, options))
+							: (_reportLevel == ReportLevel.Basic)
+								? new BasicLaunchReport(core, result, options)
+								: new MinLaunchReport(result, options))
 #if DEBUG
 							.Print()
 #endif
@@ -150,13 +167,33 @@
 			return result;
 		}
 
-		public class BasicLaunchReport
+		public class MinLaunchReport
 		{
-			#region 目录/位置
+			public MinLaunchReport(LaunchResult result, LaunchOptions options)
+			{
+				#region KMCCC信息
 
-			public string JavaPath;
+				LauncherType = KMCCC_TYPE;
+				LauncherVersion = Version;
 
-			#endregion
+				#endregion
+
+				#region 系统信息
+
+				RuntimeVersion = Environment.Version.ToString();
+				SystemVersion = Environment.OSVersion.VersionString;
+				Memory = ((uint) (SystemTools.GetTotalMemory() >> 20));
+				Arch = SystemTools.GetArch();
+
+				#endregion
+
+				#region 启动信息
+
+				LaunchErrorType = result.ErrorType.ToString();
+				AuthenticationType = options.Authenticator.Type;
+
+				#endregion
+			}
 
 			#region 启动信息
 
@@ -176,28 +213,24 @@
 
 			public string Arch;
 			public uint Memory;
-			public string ProcessorInfo;
 			public string RuntimeVersion;
 			public string SystemVersion;
-			public string VideoCardInfo;
+
+			#endregion
+		}
+
+		public class BasicLaunchReport : MinLaunchReport
+		{
+			#region 目录/位置
+
+			public string JavaPath;
 
 			#endregion
 
-			public BasicLaunchReport(LauncherCore core, LaunchResult result, LaunchOptions options)
+			public BasicLaunchReport(LauncherCore core, LaunchResult result, LaunchOptions options) : base(result, options)
 			{
-				#region KMCCC信息
-
-				LauncherType = KMCCC_TYPE;
-				LauncherVersion = Version;
-
-				#endregion
-
 				#region 系统信息
 
-				RuntimeVersion = Environment.Version.ToString();
-				SystemVersion = Environment.OSVersion.VersionString;
-				Memory = ((uint) (SystemTools.GetTotalMemory() >> 20));
-				Arch = SystemTools.GetArch();
 				VideoCardInfo = GetVideoCardInfo();
 				ProcessorInfo = GetProcessorInfo();
 
@@ -205,16 +238,33 @@
 
 				#region 启动信息
 
-				LaunchErrorType = result.ErrorType.ToString();
 				JavaPath = core.JavaPath;
-				AuthenticationType = options.Authenticator.Type;
 
 				#endregion
 			}
+
+			#region 系统信息
+
+			public string ProcessorInfo;
+			public string VideoCardInfo;
+
+			#endregion
 		}
 
 		public class FullLaunchReport : BasicLaunchReport
 		{
+			public FullLaunchReport(LauncherCore core, LaunchResult result, LaunchOptions options) : base(core, result, options)
+			{
+				LaunchedVersionId = options.Version.Id;
+				AutoConnectServer = (options.Server != null) ? options.Server.ToString() : "";
+				LauncherDirectory = Environment.CurrentDirectory;
+				GameDirectory = core.GameRootPath;
+				if (result.Handle != null)
+				{
+					PlayerName = result.Handle.Arguments.Authentication.DisplayName;
+				}
+			}
+
 			#region 目录/位置
 
 			public string GameDirectory;
@@ -229,18 +279,6 @@
 			public string PlayerName;
 
 			#endregion
-
-			public FullLaunchReport(LauncherCore core, LaunchResult result, LaunchOptions options) : base(core, result, options)
-			{
-				LaunchedVersionId = options.Version.Id;
-				AutoConnectServer = (options.Server != null) ? options.Server.ToString() : "";
-				LauncherDirectory = Environment.CurrentDirectory;
-				GameDirectory = core.GameRootPath;
-				if (result.Handle != null)
-				{
-					PlayerName = result.Handle.Arguments.Authentication.DisplayName;
-				}
-			}
 		}
 
 		#endregion
