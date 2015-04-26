@@ -18,8 +18,8 @@
 	public class YggdrasilClient
 	{
 		public const string MojnagAuthServer = @"https://authserver.mojang.com";
-
-		public const string Auth_Authentication = @"https://authserver.mojang.com/authenticate";
+		public const string Auth_Authentication = MojnagAuthServer + "/authenticate";
+		public const string Auth_Refresh = MojnagAuthServer + "/refresh";
 		private readonly object _locker = new object();
 
 		public YggdrasilClient() : this(Guid.NewGuid())
@@ -32,18 +32,128 @@
 		}
 
 		public Guid ClientToken { get; private set; }
-
 		public Guid AccessToken { get; private set; }
-
 		public Guid UUID { get; private set; }
-
 		public string DisplayName { get; private set; }
-
 		public string Properties { get; private set; }
-
 		public string AccountType { get; private set; }
 
-		public bool Authenticate(string email, string password, Boolean twitchEnabled)
+		public void Clear()
+		{
+			lock (_locker)
+			{
+				AccessToken = Guid.Empty;
+				UUID = Guid.Empty;
+				DisplayName = string.Empty;
+				Properties = string.Empty;
+				AccountType = string.Empty;
+			}
+		}
+
+		#region Refresh
+
+		public bool Refresh(bool twitchEnabled = true)
+		{
+			lock (_locker)
+			{
+				try
+				{
+					var wc = new WebClient();
+					var requestBody = JsonMapper.ToJson(new RefreshRequest
+					{
+						Agent = Agent.Minecraft,
+						AccessToken = AccessToken.ToString("N"),
+						RequestUser = twitchEnabled,
+						ClientToken = ClientToken.ToString("N")
+					});
+					var responseBody = wc.UploadString(new Uri(Auth_Refresh), requestBody);
+					var response = JsonMapper.ToObject<AuthenticationResponse>(responseBody);
+					if (response.AccessToken == null)
+					{
+						return false;
+					}
+					if (response.SelectedProfile == null)
+					{
+						return false;
+					}
+					AccessToken = Guid.Parse(response.AccessToken);
+					if (response.User != null)
+					{
+						AccountType = response.User.Legacy ? "Legacy" : "Mojang";
+						if (response.User.Properties != null)
+						{
+							Properties = response.User.Properties.ToJson();
+						}
+					}
+					else
+					{
+						AccountType = "Mojang";
+					}
+					DisplayName = response.SelectedProfile.Name;
+					UUID = Guid.Parse(response.SelectedProfile.Id);
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+
+		public bool Refresh(Guid accessToken, bool twitchEnabled = true)
+		{
+			lock (_locker)
+			{
+				Clear();
+				try
+				{
+					var wc = new WebClient();
+					var requestBody = JsonMapper.ToJson(new RefreshRequest
+					{
+						Agent = Agent.Minecraft,
+						AccessToken = accessToken.ToString("N"),
+						RequestUser = twitchEnabled,
+						ClientToken = ClientToken.ToString("N")
+					});
+					var responseBody = wc.UploadString(new Uri(Auth_Refresh), requestBody);
+					var response = JsonMapper.ToObject<AuthenticationResponse>(responseBody);
+					if (response.AccessToken == null)
+					{
+						return false;
+					}
+					if (response.SelectedProfile == null)
+					{
+						return false;
+					}
+					AccessToken = Guid.Parse(response.AccessToken);
+					if (response.User != null)
+					{
+						AccountType = response.User.Legacy ? "Legacy" : "Mojang";
+						if (response.User.Properties != null)
+						{
+							Properties = response.User.Properties.ToJson();
+						}
+					}
+					else
+					{
+						AccountType = "Mojang";
+					}
+					DisplayName = response.SelectedProfile.Name;
+					UUID = Guid.Parse(response.SelectedProfile.Id);
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+
+		#endregion
+
+		#region Authenticate
+
+		public bool Authenticate(string email, string password, bool twitchEnabled = true)
 		{
 			lock (_locker)
 			{
@@ -57,7 +167,7 @@
 						Email = email,
 						Password = password,
 						RequestUser = twitchEnabled,
-						ClientToken = ClientToken.ToString()
+						ClientToken = ClientToken.ToString("N")
 					});
 					var responseBody = wc.UploadString(new Uri(Auth_Authentication), requestBody);
 					var response = JsonMapper.ToObject<AuthenticationResponse>(responseBody);
@@ -93,7 +203,7 @@
 			}
 		}
 
-		public Task<bool> AuthenticateAsync(string email, string password, Boolean twitchEnabled, CancellationToken token)
+		public Task<bool> AuthenticateAsync(string email, string password, bool twitchEnabled = true, CancellationToken token = default(CancellationToken))
 		{
 			Clear();
 			var task = new TaskCompletionSource<bool>(token);
@@ -106,7 +216,7 @@
 					Email = email,
 					Password = password,
 					RequestUser = twitchEnabled,
-					ClientToken = ClientToken.ToString()
+					ClientToken = ClientToken.ToString("N")
 				});
 				wc.UploadStringCompleted += (sender, e) =>
 				{
@@ -155,17 +265,24 @@
 			}
 		}
 
-		public void Clear()
-		{
-			lock (_locker)
-			{
-				AccessToken = Guid.Empty;
-				UUID = Guid.Empty;
-				DisplayName = String.Empty;
-				Properties = String.Empty;
-				AccountType = String.Empty;
-			}
-		}
+		#endregion
+	}
+
+	#region Request & Response
+
+	public class RefreshRequest
+	{
+		[JsonPropertyName("agent")]
+		public Agent Agent { get; set; }
+
+		[JsonPropertyName("accessToken")]
+		public string AccessToken { get; set; }
+
+		[JsonPropertyName("requestUser")]
+		public bool RequestUser { get; set; }
+
+		[JsonPropertyName("clientToken")]
+		public string ClientToken { get; set; }
 	}
 
 	public class AuthenticationRequest
@@ -184,17 +301,6 @@
 
 		[JsonPropertyName("clientToken")]
 		public string ClientToken { get; set; }
-	}
-
-	public class Agent
-	{
-		public static readonly Agent Minecraft = new Agent {Name = "Minecraft", Version = 1};
-
-		[JsonPropertyName("name")]
-		public string Name { get; set; }
-
-		[JsonPropertyName("version")]
-		public int Version { get; set; }
 	}
 
 	public class AuthenticationResponse
@@ -222,6 +328,19 @@
 
 		[JsonPropertyName("cause")]
 		public string Cause { get; set; }
+	}
+
+	#endregion
+
+	public class Agent
+	{
+		public static readonly Agent Minecraft = new Agent {Name = "Minecraft", Version = 1};
+
+		[JsonPropertyName("name")]
+		public string Name { get; set; }
+
+		[JsonPropertyName("version")]
+		public int Version { get; set; }
 	}
 
 	public class User
