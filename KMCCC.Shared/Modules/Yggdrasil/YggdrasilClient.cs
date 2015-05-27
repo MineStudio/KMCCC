@@ -50,6 +50,25 @@
 			}
 		}
 
+		private void UpdateFomrResponse(AuthenticationResponse response)
+		{
+			AccessToken = Guid.Parse(response.AccessToken);
+			if (response.User != null)
+			{
+				AccountType = response.User.Legacy ? "Legacy" : "Mojang";
+				Properties = response.User.Properties != null
+					? response.User.Properties.ToJson()
+					: "{}";
+			}
+			else
+			{
+				AccountType = "Mojang";
+				Properties = "{}";
+			}
+			DisplayName = response.SelectedProfile.Name;
+			UUID = Guid.Parse(response.SelectedProfile.Id);
+		}
+
 		#region Refresh
 
 		public bool Refresh(bool twitchEnabled = true)
@@ -76,21 +95,7 @@
 					{
 						return false;
 					}
-					AccessToken = Guid.Parse(response.AccessToken);
-					if (response.User != null)
-					{
-						AccountType = response.User.Legacy ? "Legacy" : "Mojang";
-						if (response.User.Properties != null)
-						{
-							Properties = response.User.Properties.ToJson();
-						}
-					}
-					else
-					{
-						AccountType = "Mojang";
-					}
-					DisplayName = response.SelectedProfile.Name;
-					UUID = Guid.Parse(response.SelectedProfile.Id);
+					UpdateFomrResponse(response);
 					return true;
 				}
 				catch (Exception)
@@ -125,21 +130,7 @@
 					{
 						return false;
 					}
-					AccessToken = Guid.Parse(response.AccessToken);
-					if (response.User != null)
-					{
-						AccountType = response.User.Legacy ? "Legacy" : "Mojang";
-						if (response.User.Properties != null)
-						{
-							Properties = response.User.Properties.ToJson();
-						}
-					}
-					else
-					{
-						AccountType = "Mojang";
-					}
-					DisplayName = response.SelectedProfile.Name;
-					UUID = Guid.Parse(response.SelectedProfile.Id);
+					UpdateFomrResponse(response);
 					return true;
 				}
 				catch (Exception)
@@ -179,21 +170,7 @@
 					{
 						return false;
 					}
-					AccessToken = Guid.Parse(response.AccessToken);
-					if (response.User != null)
-					{
-						AccountType = response.User.Legacy ? "Legacy" : "Mojang";
-						if (response.User.Properties != null)
-						{
-							Properties = response.User.Properties.ToJson();
-						}
-					}
-					else
-					{
-						AccountType = "Mojang";
-					}
-					DisplayName = response.SelectedProfile.Name;
-					UUID = Guid.Parse(response.SelectedProfile.Id);
+					UpdateFomrResponse(response);
 					return true;
 				}
 				catch (Exception)
@@ -233,21 +210,7 @@
 							task.SetResult(false);
 							return;
 						}
-						AccessToken = Guid.Parse(response.AccessToken);
-						if (response.User != null)
-						{
-							AccountType = response.User.Legacy ? "Legacy" : "Mojang";
-							if (response.User.Properties != null)
-							{
-								Properties = response.User.Properties.ToJson();
-							}
-						}
-						else
-						{
-							AccountType = "Mojang";
-						}
-						DisplayName = response.SelectedProfile.Name;
-						UUID = Guid.Parse(response.SelectedProfile.Id);
+						UpdateFomrResponse(response);
 						task.SetResult(true);
 					}
 					catch (Exception exception)

@@ -7,7 +7,6 @@
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
-	using System.Runtime.InteropServices;
 	using System.Threading.Tasks;
 	using Tools;
 
@@ -17,13 +16,12 @@
 	{
 		internal object Locker = new object();
 
-
 		private LaunchResult GenerateArguments(LaunchOptions options, ref MinecraftLaunchArguments args)
 		{
 			try
 			{
 				var authentication = options.Authenticator.Do();
-				if (!String.IsNullOrWhiteSpace(authentication.Error))
+				if (!string.IsNullOrWhiteSpace(authentication.Error))
 					return new LaunchResult
 					{
 						Success = false,
@@ -84,79 +82,13 @@
 			}
 		}
 
-		#region 复制文件夹
-
-		public void CopyVersionDirectory(string directoryName, string versionId)
-		{
-			CopyDirectory(String.Format(@"{0}\versions\{2}\{1}", GameRootPath, directoryName, versionId),
-				String.Format(@"{0}\{1}", GameRootPath, directoryName));
-		}
-
-		public void CopyDirectory(string source, string target)
-		{
-			var code = CurrentCode;
-			if (!Directory.Exists(source)) return;
-			if (Directory.Exists(target))
-			{
-				Directory.Delete(target, true);
-			}
-			UsefulTools.Dircopy(source, target);
-			Action<LaunchHandle, int> handler = null;
-			handler = (handle, c) =>
-			{
-				if (handle.Code == code)
-				{
-					Directory.Delete(source, true);
-					UsefulTools.Dircopy(target, source);
-					Directory.Delete(target, true);
-				}
-				GameExit -= handler;
-			};
-			GameExit += handler;
-		}
-
-		public void CopyVersionDirectories(string ver)
-		{
-			var root = String.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
-			if (!Directory.Exists(root))
-			{
-				return;
-			}
-			foreach (var dir in new DirectoryInfo(root).EnumerateDirectories())
-			{
-				CopyDirectory(dir.FullName, String.Format(@"{0}\{1}", GameRootPath, dir.Name));
-			}
-		}
-
-		#endregion
-
-		#region 事件
-
-		internal void Log(LaunchHandle handle, string line)
-		{
-			if (GameLog != null)
-			{
-				GameLog(handle, line);
-			}
-		}
-
-		internal void Exit(LaunchHandle handle, int code)
-		{
-			if (GameExit != null)
-			{
-				GameExit(handle, code);
-			}
-		}
-
-		#endregion
-
 		internal LaunchResult LaunchInternal(LaunchOptions options, params Action<MinecraftLaunchArguments>[] argumentsOperators)
 		{
 			lock (Locker)
 			{
 				if (!File.Exists(JavaPath))
 				{
-					return new LaunchResult { Success = false, ErrorType = ErrorType.NoJAVA, ErrorMessage = "指定的JAVA位置不存在" };
+					return new LaunchResult {Success = false, ErrorType = ErrorType.NoJAVA, ErrorMessage = "指定的JAVA位置不存在"};
 				}
 				CurrentCode = Random.Next();
 				var args = new MinecraftLaunchArguments();
@@ -177,7 +109,7 @@
 					}
 					catch (Exception exp)
 					{
-						return new LaunchResult { Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp };
+						return new LaunchResult {Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp};
 					}
 				}
 				return LaunchGame(args);
@@ -211,5 +143,71 @@
 				return new LaunchResult {Success = false, ErrorType = ErrorType.Unknown, ErrorMessage = "启动时出现了异常", Exception = exp};
 			}
 		}
+
+		#region 复制文件夹
+
+		public void CopyVersionDirectory(string directoryName, string versionId)
+		{
+			CopyDirectory(string.Format(@"{0}\versions\{2}\{1}", GameRootPath, directoryName, versionId),
+				string.Format(@"{0}\{1}", GameRootPath, directoryName));
+		}
+
+		public void CopyDirectory(string source, string target)
+		{
+			var code = CurrentCode;
+			if (!Directory.Exists(source)) return;
+			if (Directory.Exists(target))
+			{
+				Directory.Delete(target, true);
+			}
+			UsefulTools.Dircopy(source, target);
+			Action<LaunchHandle, int> handler = null;
+			handler = (handle, c) =>
+			{
+				if (handle.Code == code)
+				{
+					Directory.Delete(source, true);
+					UsefulTools.Dircopy(target, source);
+					Directory.Delete(target, true);
+				}
+				GameExit -= handler;
+			};
+			GameExit += handler;
+		}
+
+		public void CopyVersionDirectories(string ver)
+		{
+			var root = string.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
+			if (!Directory.Exists(root))
+			{
+				return;
+			}
+			foreach (var dir in new DirectoryInfo(root).EnumerateDirectories())
+			{
+				CopyDirectory(dir.FullName, string.Format(@"{0}\{1}", GameRootPath, dir.Name));
+			}
+		}
+
+		#endregion
+
+		#region 事件
+
+		internal void Log(LaunchHandle handle, string line)
+		{
+			if (GameLog != null)
+			{
+				GameLog(handle, line);
+			}
+		}
+
+		internal void Exit(LaunchHandle handle, int code)
+		{
+			if (GameExit != null)
+			{
+				GameExit(handle, code);
+			}
+		}
+
+		#endregion
 	}
 }
