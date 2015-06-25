@@ -12,12 +12,12 @@ Shared Code Between KMCCC.Basic & KMCCC.Pro
 
 ### Included:
 
-- Basic Laucnch Model (LauncherCore, LaunchOptions, ...)
+- Basic Launch Model (LauncherCore, LaunchOptions, ...)
 - Authentication Model (Yggdrasil, Offline, ...)
 - Java & System Information Finder
 - Zip Module using .Net Internal API ( MS.Internal.IO.Zip.* )
 - Basic VersionLocator (JVersion)
-- A set of usefull extensions
+- A set of useful extensions
 - A launch reporter that can be disabled
 
 ## KMCCC.Basic
@@ -37,8 +37,8 @@ Professional Version of KMCCC
 
 - Everything in KMCCC.Shared
 - [WIP] Game File Download & Fix & Check (Including Version, Library, Native&Assets)
-- [WIP] More usefull extensions for LaunchHandle
-- [WIP] More usefull libraries that a launch might need.
+- [WIP] More useful extensions for LaunchHandle
+- [WIP] More useful libraries that a launch might need.
 
 ## Plan
 
