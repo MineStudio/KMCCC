@@ -75,7 +75,7 @@ var version = core.GetVersion("1.8");
 
 
 ```csharp
-var result = App.LauncherCore.Launch(new LaunchOptions
+var result = core.Launch(new LaunchOptions
 {
 	Version = App.LauncherCore.GetVersion(server.VersionId)
 	Authenticator = new OfflineAuthenticator("Steve"), // offline
