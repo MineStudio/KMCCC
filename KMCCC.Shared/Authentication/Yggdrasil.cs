@@ -1,13 +1,10 @@
-﻿namespace KMCCC.Authentication
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using KMCCC.Modules.Yggdrasil;
+
+namespace KMCCC.Authentication
 {
-	#region
-
-	using System;
-	using System.Threading;
-	using System.Threading.Tasks;
-	using Modules.Yggdrasil;
-
-	#endregion
 
 	#region Login
 
@@ -23,12 +20,14 @@
 		/// <param name="password">密码</param>
 		/// <param name="twitchEnabled">是否启用Twitch</param>
 		/// <param name="clientToken">clientToken</param>
-		public YggdrasilLogin(string email, string password, bool twitchEnabled, Guid clientToken)
+		/// <param name="authServer">验证服务器</param>
+		public YggdrasilLogin(string email, string password, bool twitchEnabled, Guid clientToken, string authServer = null)
 		{
 			Email = email;
 			Password = password;
 			TwitchEnabled = twitchEnabled;
 			ClientToken = clientToken;
+			AuthServer = authServer;
 		}
 
 		/// <summary>
@@ -37,40 +36,43 @@
 		/// <param name="email">电子邮件地址</param>
 		/// <param name="password">密码</param>
 		/// <param name="twitchEnabled">是否启用Twitch</param>
-		public YggdrasilLogin(string email, string password, bool twitchEnabled) : this(email, password, twitchEnabled, Guid.NewGuid())
+		/// <param name="authServer">验证服务器</param>
+		public YggdrasilLogin(string email, string password, bool twitchEnabled, string authServer = null)
+			: this(email, password, twitchEnabled, Guid.NewGuid(), authServer)
 		{
 		}
 
 		/// <summary>
 		///     电子邮件地址
 		/// </summary>
-		public string Email { get; private set; }
+		public string Email { get; }
 
 		/// <summary>
 		///     密码
 		/// </summary>
-		public string Password { get; private set; }
+		public string Password { get; }
 
 		/// <summary>
 		///     是否启用Twitch
 		/// </summary>
-		public bool TwitchEnabled { get; private set; }
+		public bool TwitchEnabled { get; }
 
 		/// <summary>
 		/// </summary>
-		public Guid ClientToken { get; private set; }
+		public Guid ClientToken { get; }
+
+		/// <summary>
+		/// </summary>
+		public string AuthServer { get; set; }
 
 		/// <summary>
 		///     返回Yggdrasil验证器类型
 		/// </summary>
-		public string Type
-		{
-			get { return "KMCCC.Yggdrasil"; }
-		}
+		public string Type => "KMCCC.Yggdrasil";
 
 		public AuthenticationInfo Do()
 		{
-			var client = new YggdrasilClient(ClientToken);
+			var client = new YggdrasilClient(AuthServer, ClientToken);
 			if (client.Authenticate(Email, Password, TwitchEnabled))
 			{
 				return new AuthenticationInfo
@@ -90,7 +92,7 @@
 
 		public Task<AuthenticationInfo> DoAsync(CancellationToken token)
 		{
-			var client = new YggdrasilClient(ClientToken);
+			var client = new YggdrasilClient(AuthServer, ClientToken);
 			return client.AuthenticateAsync(Email, Password, TwitchEnabled, token).ContinueWith(task =>
 			{
 				if ((task.Exception == null) && (task.Result))
@@ -127,11 +129,12 @@
 		/// <param name="accessToken">合法的Token</param>
 		/// <param name="twitchEnabled">是否启用Twitch</param>
 		/// <param name="clientToken">clientToken</param>
-		public YggdrasilRefresh(Guid accessToken, bool twitchEnabled, Guid clientToken)
+		public YggdrasilRefresh(Guid accessToken, bool twitchEnabled, Guid clientToken, string authServer = null)
 		{
 			AccessToken = accessToken;
 			TwitchEnabled = twitchEnabled;
 			ClientToken = clientToken;
+			AuthServer = authServer;
 		}
 
 		/// <summary>
@@ -139,33 +142,34 @@
 		/// </summary>
 		/// <param name="accessToken">合法的Token</param>
 		/// <param name="twitchEnabled">是否启用Twitch</param>
-		public YggdrasilRefresh(Guid accessToken, bool twitchEnabled)
-			: this(accessToken, twitchEnabled, Guid.NewGuid())
+		public YggdrasilRefresh(Guid accessToken, bool twitchEnabled, string authServer = null)
+			: this(accessToken, twitchEnabled, Guid.NewGuid(), authServer)
 		{
 		}
 
-		public Guid AccessToken { get; private set; }
+		public Guid AccessToken { get; }
 
 		/// <summary>
 		///     是否启用Twitch
 		/// </summary>
-		public bool TwitchEnabled { get; private set; }
+		public bool TwitchEnabled { get; }
 
 		/// <summary>
 		/// </summary>
-		public Guid ClientToken { get; private set; }
+		public Guid ClientToken { get; }
+
+		/// <summary>
+		/// </summary>
+		public string AuthServer { get; set; }
 
 		/// <summary>
 		///     返回Yggdrasil验证器类型
 		/// </summary>
-		public string Type
-		{
-			get { return "KMCCC.Yggdrasil"; }
-		}
+		public string Type => "KMCCC.Yggdrasil";
 
 		public AuthenticationInfo Do()
 		{
-			var client = new YggdrasilClient(ClientToken);
+			var client = new YggdrasilClient(AuthServer, ClientToken);
 			if (client.Refresh(AccessToken, TwitchEnabled))
 			{
 				return new AuthenticationInfo

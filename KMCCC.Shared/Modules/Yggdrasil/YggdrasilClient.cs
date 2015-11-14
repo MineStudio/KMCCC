@@ -1,14 +1,15 @@
-﻿namespace KMCCC.Modules.Yggdrasil
-{
-	#region
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using LitJson;
 
-	using System;
-	using System.Collections.Generic;
-	using System.Net;
-	using System.Text;
-	using System.Threading;
-	using System.Threading.Tasks;
-	using LitJson;
+namespace KMCCC.Modules.Yggdrasil
+{
+
+	#region
 
 	#endregion
 
@@ -18,20 +19,26 @@
 	public class YggdrasilClient
 	{
 		public const string MojnagAuthServer = @"https://authserver.mojang.com";
-		public const string Auth_Authentication = MojnagAuthServer + "/authenticate";
-		public const string Auth_Refresh = MojnagAuthServer + "/refresh";
+		private string Auth_Authentication => _authServer + "/authenticate";
+		private string Auth_Refresh => _authServer + "/refresh";
 		private readonly object _locker = new object();
+		private readonly string _authServer;
 
-		public YggdrasilClient() : this(Guid.NewGuid())
+		public YggdrasilClient(string authServer = null) : this(authServer, Guid.NewGuid())
 		{
 		}
 
-		public YggdrasilClient(Guid clientToken)
+		public YggdrasilClient(Guid clientToken) : this(null, clientToken)
 		{
+		}
+
+		public YggdrasilClient(string authServer, Guid clientToken)
+		{
+			_authServer = authServer ?? MojnagAuthServer;
 			ClientToken = clientToken;
 		}
 
-		public Guid ClientToken { get; private set; }
+		public Guid ClientToken { get; }
 		public Guid AccessToken { get; private set; }
 		public Guid UUID { get; private set; }
 		public string DisplayName { get; private set; }
@@ -180,7 +187,8 @@
 			}
 		}
 
-		public Task<bool> AuthenticateAsync(string email, string password, bool twitchEnabled = true, CancellationToken token = default(CancellationToken))
+		public Task<bool> AuthenticateAsync(string email, string password, bool twitchEnabled = true,
+			CancellationToken token = default(CancellationToken))
 		{
 			Clear();
 			var task = new TaskCompletionSource<bool>(token);
