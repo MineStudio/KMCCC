@@ -58,13 +58,13 @@
 				DisplayName = DisplayName,
 				UUID = Guid.NewGuid(),
 				Properties = "{}",
-				UserType = "Mojang"
+				UserType = "mojang"
 			};
 		}
 
 		public Task<AuthenticationInfo> DoAsync(CancellationToken token)
 		{
-			return Task.Factory.StartNew((Func<AuthenticationInfo>)Do, token);
+			return Task.Factory.StartNew((Func<AuthenticationInfo>) Do, token);
 		}
 	}
 }
