@@ -1,22 +1,24 @@
 ﻿namespace KMCCC.Tools
 {
-	#region
+    #region
 
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using Microsoft.VisualBasic.Devices;
-	using Microsoft.Win32;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Microsoft.VisualBasic.Devices;
+    using Microsoft.Win32;
+    using System.Runtime.InteropServices;
+    using System.Diagnostics;
 
-	#endregion
+    #endregion
 
-	public class SystemTools
+    public class SystemTools
 	{
-		/// <summary>
-		///     从注册表中查找可能的javaw.exe位置
-		/// </summary>
-		/// <returns>JAVA地址列表</returns>
-		public static IEnumerable<string> FindJava()
+        /// <summary>
+        ///     从注册表中查找可能的javaw.exe位置
+        /// </summary>
+        /// <returns>JAVA地址列表</returns>
+        public static IEnumerable<string> FindJava()
 		{
 			try
 			{
@@ -72,5 +74,37 @@
 		{
 			return Environment.Is64BitOperatingSystem ? "64" : "32";
 		}
-	}
+
+        /// <summary>
+        /// 获取系统剩余内存
+        /// </summary>
+        /// <returns>剩余内存</returns>
+        public static ulong GetRunmemory()
+        {
+            ComputerInfo ComputerMemory = new Microsoft.VisualBasic.Devices.ComputerInfo();
+            return ComputerMemory.AvailablePhysicalMemory / 1048576;
+
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        internal static extern IntPtr SetProcessWorkingSetSize(IntPtr hProcess, IntPtr dwMinimumWorkingSetSize, IntPtr dwMaximumWorkingSetSize);
+        public void ClearRAM()
+        {
+            SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle, GetIntPtrFromInt(-1), GetIntPtrFromInt(-1));
+        }
+        private static IntPtr GetIntPtrFromInt(int i)
+        {
+            IntPtr ptr2;
+            if (GetArch() == "64")
+            {
+                ptr2 = Marshal.AllocHGlobal(8);
+            }
+            else
+            {
+                ptr2 = Marshal.AllocHGlobal(4);
+            }
+            Marshal.WriteInt32(ptr2, i);
+            return ptr2;
+        }
+    }
 }

@@ -52,7 +52,10 @@
 		[JsonPropertyName("name")]
 		public string Name { get; set; }
 
-		[JsonPropertyName("natives")]
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [JsonPropertyName("natives")]
 		public Dictionary<string, string> Natives { get; set; }
 
 		[JsonPropertyName("rules")]
