@@ -92,12 +92,17 @@
 		///     Version
 		/// </summary>
 		public string Version { get; set; }
+
+        ///<summary>
+        ///     Url
+        /// </summary>
+        public string Url { get; set; }
 	}
 
-	/// <summary>
-	///     表示本机实现
-	/// </summary>
-	public class Native
+    /// <summary>
+    ///     表示本机实现
+    /// </summary>
+    public class Native
 	{
 		/// <summary>
 		///     NS
@@ -123,7 +128,12 @@
 		///     解压参数
 		/// </summary>
 		public UnzipOptions Options { get; set; }
-	}
+
+        ///<summary>
+        ///     Url
+        /// </summary>
+        public string Url { get; set; }
+    }
 
 	/// <summary>
 	///     找Item，自己看我不加注释了

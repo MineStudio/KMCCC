@@ -139,7 +139,8 @@
 						{
 							NS = names[0],
 							Name = names[1],
-							Version = names[2]
+							Version = names[2],
+                            Url = lib.Url
 						});
 					}
 					else
@@ -153,7 +154,8 @@
 							NS = names[0],
 							Name = names[1],
 							Version = names[2],
-							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch())
+							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch()),
+                            Url = lib.Url
 						};
 						version.Natives.Add(native);
 						if (lib.Extract != null)
