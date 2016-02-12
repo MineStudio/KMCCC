@@ -105,7 +105,7 @@
 				}
 				if (string.IsNullOrWhiteSpace(jver.Assets))
 				{
-					jver.Assets = "legacy";
+					version.Assets = "legacy";
 				}
 				if (jver.Libraries == null)
 				{
@@ -113,7 +113,6 @@
 				}
 				version.Id = jver.Id;
 				version.MinecraftArguments = jver.MinecraftArguments;
-				version.Assets = jver.Assets;
 				version.MainClass = jver.MainClass;
 				version.JarId = jver.JarId;
 				version.Libraries = new List<Library>();
@@ -173,7 +172,7 @@
 					}
 					else
 					{
-						version.Assets = version.Assets ?? target.Assets;
+						version.Assets = jver.Assets ?? target.Assets;
 						version.JarId = version.JarId ?? target.JarId;
 						version.MainClass = version.MainClass ?? target.MainClass;
 						version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
