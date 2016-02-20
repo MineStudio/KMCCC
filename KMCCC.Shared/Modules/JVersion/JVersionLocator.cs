@@ -107,6 +107,10 @@
 				{
 					version.Assets = "legacy";
 				}
+                else
+                {
+                    version.Assets = jver.Assets;
+                }
 				if (jver.Libraries == null)
 				{
 					return null;

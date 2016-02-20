@@ -45,6 +45,9 @@
 
 		[JsonPropertyName("jar")]
 		public string JarId { get; set; }
+
+        [JsonPropertyName("downloads")]
+        public JDownload Downloads { get; set; }
 	}
 
 	public class JLibrary
@@ -85,4 +88,34 @@
 		[JsonPropertyName("exclude")]
 		public List<string> Exculde { get; set; }
 	}
+
+    public class JDownload {
+        [JsonPropertyName("client")]
+        public JDownloadInfo Client { get; set; }
+
+        [JsonPropertyName("server")]
+        public JDownloadInfo Server { get; set; }
+    }
+
+    public class JDownloadInfo {
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [JsonPropertyName("sha1")]
+        public string SHA1{ get; set; }
+
+        [JsonPropertyName("size")]
+        public int Size { get; set; }
+    }
+
+    public class JAssetIndex : JDownloadInfo{
+        [JsonPropertyName("totalSize")]
+        public long TotalSize { get; set; }
+
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [JsonPropertyName("known")]
+        public bool Known { get; set; }
+    }
 }
