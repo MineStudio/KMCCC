@@ -119,6 +119,7 @@
 				version.MinecraftArguments = jver.MinecraftArguments;
 				version.MainClass = jver.MainClass;
 				version.JarId = jver.JarId;
+                version.Type = jver.Type;
 				version.Libraries = new List<Library>();
 				version.Natives = new List<Native>();
 				foreach (var lib in jver.Libraries)

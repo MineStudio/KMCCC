@@ -62,6 +62,7 @@
 				args.Tokens.Add("game_assets", "assets");
 				args.Tokens.Add("assets_root", "assets");
 				args.Tokens.Add("assets_index_name", options.Version.Assets);
+                args.Tokens.Add("version_type", options.Version.Type);
 				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
 				args.Tokens.Add("user_properties", authentication.Properties);
 				args.Tokens.Add("user_type", authentication.UserType);

@@ -71,6 +71,10 @@
 		///     Jar文件（Id）
 		/// </summary>
 		public string JarId { get; set; }
+        /// <summary>
+        ///     版本类型
+        /// </summary>
+        public string Type { get; set; }
 	}
 
 	/// <summary>
