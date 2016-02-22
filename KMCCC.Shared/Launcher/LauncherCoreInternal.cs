@@ -59,7 +59,7 @@
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
 				args.Tokens.Add("version_name", options.Version.Id);
 				args.Tokens.Add("game_directory", ".");
-				args.Tokens.Add("game_assets", "assets");
+				args.Tokens.Add("game_assets", options.Version.Assets.Equals("legacy") ? "assets\\virtual\\legacy" : "assets");
 				args.Tokens.Add("assets_root", "assets");
 				args.Tokens.Add("assets_index_name", options.Version.Assets);
                 args.Tokens.Add("version_type", options.Version.Type);
