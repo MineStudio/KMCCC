@@ -105,17 +105,21 @@
 				}
 				if (string.IsNullOrWhiteSpace(jver.Assets))
 				{
-					jver.Assets = "legacy";
+					version.Assets = "legacy";
 				}
+                else
+                {
+                    version.Assets = jver.Assets;
+                }
 				if (jver.Libraries == null)
 				{
 					return null;
 				}
 				version.Id = jver.Id;
 				version.MinecraftArguments = jver.MinecraftArguments;
-				version.Assets = jver.Assets;
 				version.MainClass = jver.MainClass;
 				version.JarId = jver.JarId;
+                version.Type = jver.Type;
 				version.Libraries = new List<Library>();
 				version.Natives = new List<Native>();
 				foreach (var lib in jver.Libraries)
@@ -139,7 +143,8 @@
 						{
 							NS = names[0],
 							Name = names[1],
-							Version = names[2]
+							Version = names[2],
+                            Url = lib.Url
 						});
 					}
 					else
@@ -153,7 +158,8 @@
 							NS = names[0],
 							Name = names[1],
 							Version = names[2],
-							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch())
+							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch()),
+                            Url = lib.Url
 						};
 						version.Natives.Add(native);
 						if (lib.Extract != null)
@@ -171,7 +177,7 @@
 					}
 					else
 					{
-						version.Assets = version.Assets ?? target.Assets;
+						version.Assets = jver.Assets ?? target.Assets;
 						version.JarId = version.JarId ?? target.JarId;
 						version.MainClass = version.MainClass ?? target.MainClass;
 						version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;

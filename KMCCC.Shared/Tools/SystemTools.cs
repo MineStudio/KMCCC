@@ -56,12 +56,27 @@
 				return new string[0];
 			}
 		}
-
-		/// <summary>
-		///     取物理内存
-		/// </summary>
-		/// <returns>物理内存</returns>
-		public static ulong GetTotalMemory()
+        /// <summary>
+        ///     调用<c>FindJava</c>后判断JAVA地址是否有效
+        /// </summary>
+        /// <returns>有效JAVA地址列表</returns>
+        public static IEnumerable<string> FindValidJava()
+        {
+            try
+            {
+                IEnumerable<string> list = FindJava();
+                return (from java in list where System.IO.File.Exists(java) select java);
+            }
+            catch
+            {
+                return new string[0];
+            }
+        }
+        /// <summary>
+        ///     取物理内存
+        /// </summary>
+        /// <returns>物理内存</returns>
+        public static ulong GetTotalMemory()
 		{
 			return new Computer().Info.TotalPhysicalMemory;
 		}
