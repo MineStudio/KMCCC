@@ -55,14 +55,15 @@
 				args.Libraries.Add(this.GetVersionJarPath(options.Version.JarId));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
 
-				args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
+                string AssetsPath = options.Version.Assets == "legacy" ? "assets\\virtual\\legacy" : "assets";
+                args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
 				args.Tokens.Add("version_name", options.Version.Id);
 				args.Tokens.Add("game_directory", ".");
-				args.Tokens.Add("game_assets", "assets");
-				args.Tokens.Add("assets_root", "assets");
-				args.Tokens.Add("assets_index_name", options.Version.Assets);
+                args.Tokens.Add("game_assets", AssetsPath);
+                args.Tokens.Add("assets_root", AssetsPath);
+                args.Tokens.Add("assets_index_name", options.Version.Assets);
 				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
 				args.Tokens.Add("user_properties", authentication.Properties);
 				args.Tokens.Add("user_type", authentication.UserType);

@@ -171,7 +171,9 @@
 					}
 					else
 					{
-						version.Assets = version.Assets ?? target.Assets;
+                        if (version.Assets == "legacy")
+                            version.Assets = null;
+                        version.Assets = version.Assets ?? target.Assets;
 						version.JarId = version.JarId ?? target.JarId;
 						version.MainClass = version.MainClass ?? target.MainClass;
 						version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
