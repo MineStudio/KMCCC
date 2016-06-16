@@ -19,6 +19,7 @@ Shared Code Between KMCCC.Basic & KMCCC.Pro
 - Basic VersionLocator (JVersion)
 - A set of useful extensions
 - A launch reporter that can be disabled
+- Custom authentication server
 
 ## KMCCC.Basic
 
