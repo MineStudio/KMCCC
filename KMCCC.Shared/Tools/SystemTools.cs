@@ -83,15 +83,19 @@
         {
             ComputerInfo ComputerMemory = new Microsoft.VisualBasic.Devices.ComputerInfo();
             return ComputerMemory.AvailablePhysicalMemory / 1048576;
-
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         internal static extern IntPtr SetProcessWorkingSetSize(IntPtr hProcess, IntPtr dwMinimumWorkingSetSize, IntPtr dwMaximumWorkingSetSize);
+
+        /// <summary>
+        ///     清理内存
+        /// </summary>
         public void ClearRAM()
         {
             SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle, GetIntPtrFromInt(-1), GetIntPtrFromInt(-1));
         }
+
         private static IntPtr GetIntPtrFromInt(int i)
         {
             IntPtr ptr2;

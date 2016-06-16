@@ -48,10 +48,15 @@
 		/// </summary>
 		public int MinMemory { get; set; }
 
-		/// <summary>
-		///     默认true，不要作死去设置成false
-		/// </summary>
-		public bool CGCEnabled { get; set; }
+        /// <summary>
+        ///     Java Agent设置
+        /// </summary>
+        public string AgentPath { get; set; }
+
+        /// <summary>
+        ///     默认true，不要作死去设置成false
+        /// </summary>
+        public bool CGCEnabled { get; set; }
 
 		/// <summary>
 		///     本地dll文件地址
@@ -90,7 +95,11 @@
 		public string ToArguments()
 		{
 			var sb = new StringBuilder();
-			if (CGCEnabled)
+            if (AgentPath != null && AgentPath != "")
+            {
+                sb.Append("-javaagent:\"").Append(this.AgentPath + "\" ");
+            }
+            if (CGCEnabled)
 			{
 				sb.Append("-Xincgc");
 			}
@@ -112,10 +121,13 @@
 			}
 			sb.Append(" -Djava.library.path=\"").Append(NativePath);
 			sb.Append("\" -cp \"");
-			foreach (var lib in Libraries)
-			{
-				sb.Append(lib).Append(';');
-			}
+            if (Libraries.Count > 0)
+            {
+                foreach (var lib in Libraries)
+                {
+                    sb.Append(lib).Append(';');
+                }
+            }
 			sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));
 			if (Server != null)
 			{

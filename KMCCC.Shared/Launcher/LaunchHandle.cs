@@ -47,7 +47,12 @@
 		///     设置窗口大小
 		/// </summary>
 		public WindowSize Size { get; set; }
-	}
+
+        /// <summary>
+        ///     Agent设置（高级内容）
+        /// </summary>
+        public string AgentPath { get; set; }
+    }
 
 	/// <summary>
 	///     启动句柄，基本上也就比较用

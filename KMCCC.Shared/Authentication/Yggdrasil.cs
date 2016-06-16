@@ -21,14 +21,15 @@ namespace KMCCC.Authentication
 		/// <param name="twitchEnabled">是否启用Twitch</param>
 		/// <param name="clientToken">clientToken</param>
 		/// <param name="authServer">验证服务器</param>
-		public YggdrasilLogin(string email, string password, bool twitchEnabled, Guid clientToken, string authServer = null)
+		public YggdrasilLogin(string email, string password, bool twitchEnabled, Guid clientToken, string token = null, string authServer = null)
 		{
 			Email = email;
 			Password = password;
 			TwitchEnabled = twitchEnabled;
 			ClientToken = clientToken;
 			AuthServer = authServer;
-		}
+            Token = token;
+        }
 
 		/// <summary>
 		///     新建正版验证器(随机的新ClientToken)
@@ -37,7 +38,7 @@ namespace KMCCC.Authentication
 		/// <param name="password">密码</param>
 		/// <param name="twitchEnabled">是否启用Twitch</param>
 		/// <param name="authServer">验证服务器</param>
-		public YggdrasilLogin(string email, string password, bool twitchEnabled, string authServer = null)
+		public YggdrasilLogin(string email, string password, bool twitchEnabled, string token = null, string authServer = null)
 			: this(email, password, twitchEnabled, Guid.NewGuid(), authServer)
 		{
 		}
@@ -62,18 +63,24 @@ namespace KMCCC.Authentication
 		public Guid ClientToken { get; }
 
 		/// <summary>
+        ///     第三方服务器
 		/// </summary>
 		public string AuthServer { get; set; }
 
-		/// <summary>
-		///     返回Yggdrasil验证器类型
-		/// </summary>
-		public string Type => "KMCCC.Yggdrasil";
+        /// <summary>
+        ///     第三方验证服务器的一些验证Token（伪正版）
+        /// </summary>
+        public string Token { get; set; }
+
+        /// <summary>
+        ///     返回Yggdrasil验证器类型
+        /// </summary>
+        public string Type => "KMCCC.Yggdrasil";
 
 		public AuthenticationInfo Do()
 		{
 			var client = new YggdrasilClient(AuthServer, ClientToken);
-			if (client.Authenticate(Email, Password, TwitchEnabled))
+			if (client.Authenticate(Email, Password, Token, TwitchEnabled))
 			{
 				return new AuthenticationInfo
 				{
@@ -93,7 +100,7 @@ namespace KMCCC.Authentication
 		public Task<AuthenticationInfo> DoAsync(CancellationToken token)
 		{
 			var client = new YggdrasilClient(AuthServer, ClientToken);
-			return client.AuthenticateAsync(Email, Password, TwitchEnabled, token).ContinueWith(task =>
+			return client.AuthenticateAsync(Email, Password, Token, TwitchEnabled, token).ContinueWith(task =>
 			{
 				if ((task.Exception == null) && (task.Result))
 				{

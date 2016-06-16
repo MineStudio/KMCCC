@@ -151,7 +151,7 @@ namespace KMCCC.Modules.Yggdrasil
 
 		#region Authenticate
 
-		public bool Authenticate(string email, string password, bool twitchEnabled = true)
+		public bool Authenticate(string email, string password, string ExToken = null, bool twitchEnabled = true)
 		{
 			lock (_locker)
 			{
@@ -159,12 +159,14 @@ namespace KMCCC.Modules.Yggdrasil
 				try
 				{
 					var wc = new WebClient();
-					var requestBody = JsonMapper.ToJson(new AuthenticationRequest
+                    wc.Headers.Add("Content-Type", "application/json");
+                    var requestBody = JsonMapper.ToJson(new AuthenticationRequest
 					{
 						Agent = Agent.Minecraft,
 						Email = email,
 						Password = password,
-						RequestUser = twitchEnabled,
+                        token = ExToken,
+                        RequestUser = twitchEnabled,
 						ClientToken = ClientToken.ToString("N")
 					});
 					var responseBody = wc.UploadString(new Uri(Auth_Authentication), requestBody);
@@ -187,7 +189,7 @@ namespace KMCCC.Modules.Yggdrasil
 			}
 		}
 
-		public Task<bool> AuthenticateAsync(string email, string password, bool twitchEnabled = true,
+		public Task<bool> AuthenticateAsync(string email, string password, string ExToken = null, bool twitchEnabled = true,
 			CancellationToken token = default(CancellationToken))
 		{
 			Clear();
@@ -201,7 +203,8 @@ namespace KMCCC.Modules.Yggdrasil
 					Email = email,
 					Password = password,
 					RequestUser = twitchEnabled,
-					ClientToken = ClientToken.ToString("N")
+                    token = ExToken,
+                    ClientToken = ClientToken.ToString("N")
 				});
 				wc.UploadStringCompleted += (sender, e) =>
 				{
@@ -272,7 +275,10 @@ namespace KMCCC.Modules.Yggdrasil
 
 		[JsonPropertyName("clientToken")]
 		public string ClientToken { get; set; }
-	}
+
+        [JsonPropertyName("token")]
+        public string token { get; set; }
+    }
 
 	public class AuthenticationResponse
 	{

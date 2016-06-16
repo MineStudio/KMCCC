@@ -31,7 +31,8 @@
 				args.CGCEnabled = true;
 				args.MainClass = options.Version.MainClass;
 				args.MaxMemory = options.MaxMemory;
-				args.MinMemory = options.MinMemory;
+                args.AgentPath = options.AgentPath;
+                args.MinMemory = options.MinMemory;
 				args.NativePath = GameRootPath + @"\$natives";
 				foreach (var native in options.Version.Natives)
 				{
