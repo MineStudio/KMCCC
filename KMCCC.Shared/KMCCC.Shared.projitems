@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modules\JVersion\JVersion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modules\JVersion\JVersionLocator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modules\Yggdrasil\YggdrasilClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modules\Zip\ZipArchive.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\SystemTools.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\UsefulTools.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\ZipTools.cs" />
