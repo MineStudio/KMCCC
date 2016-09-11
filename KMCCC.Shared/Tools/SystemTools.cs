@@ -22,11 +22,12 @@
 		{
 			try
 			{
-				var rootReg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
-				return rootReg == null
-					? new string[0]
-					: FindJavaInternal(rootReg).Union(FindJavaInternal(rootReg.OpenSubKey("Wow6432Node")));
-			}
+                var rootReg = Environment.Is64BitOperatingSystem 
+                    ? RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE") 
+                    : RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey("SOFTWARE");
+
+                return rootReg == null ? new string[0] : FindJavaInternal(rootReg).Union(FindJavaInternal(rootReg.OpenSubKey("Wow6432Node")));
+            }
 			catch
 			{
 				return new string[0];
