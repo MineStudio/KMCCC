@@ -39,9 +39,13 @@ namespace KMCCC.Authentication
 		/// <param name="twitchEnabled">是否启用Twitch</param>
 		/// <param name="authServer">验证服务器</param>
 		public YggdrasilLogin(string email, string password, bool twitchEnabled, string token = null, string authServer = null)
-			: this(email, password, twitchEnabled, Guid.NewGuid(), authServer)
 		{
-		}
+            Email = email;
+            Password = password;
+            TwitchEnabled = twitchEnabled;
+            AuthServer = authServer;
+            Token = token;
+        }
 
 		/// <summary>
 		///     电子邮件地址
