@@ -67,8 +67,9 @@
 				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
 				args.Tokens.Add("user_properties", authentication.Properties);
 				args.Tokens.Add("user_type", authentication.UserType);
+                args.Tokens.Add("version_type", options.VersionType ?? "KMCCC");
 
-				args.AdvencedArguments = new List<string> {"-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true"};
+                args.AdvencedArguments = new List<string> {"-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true"};
 
 				args.Authentication = authentication;
 				args.Version = options.Version;

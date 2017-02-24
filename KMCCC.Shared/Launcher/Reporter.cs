@@ -51,7 +51,7 @@
 		private const string SERVICE_ROOT = @"http://api.kmccc.minestudio.org/v1";
 #endif
 
-		public const string Version = "0.9.5.4";
+		public const string Version = "0.9.5.6";
 
 		private const string LAUNCH_REPORT = SERVICE_ROOT + "/launch";
 

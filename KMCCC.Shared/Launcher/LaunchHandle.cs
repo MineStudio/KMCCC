@@ -52,7 +52,13 @@
         ///     Agent设置（高级内容）
         /// </summary>
         public string AgentPath { get; set; }
+
+        /// <summary>
+        ///  设置版本类型（用于1.9以上版本左下角版本号右边的信息显示）
+        /// </summary>
+        public string VersionType { get; set; }
     }
+
 
 	/// <summary>
 	///     启动句柄，基本上也就比较用
