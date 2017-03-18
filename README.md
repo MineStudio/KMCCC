@@ -89,4 +89,14 @@ var result = core.Launch(new LaunchOptions
 }, (Action<MinecraftLaunchArguments>) (x => { })); // optional ( modify arguments before launching
 ```
 
+## Using anonymous report ##
+
+```csharp
+Reporter.SetClientName("Your launcher's name"); // set name
+Reporter.SetReportLevel(ReportLevel.Full); // full report
+//Reporter.SetReportLevel(ReportLevel.Basic); // basic report
+//Reporter.SetReportLevel(ReportLevel.Min); // simplified report
+//Reporter.SetReportLevel(ReportLevel.None); // turn off
+```
+
 # Enjoy!
