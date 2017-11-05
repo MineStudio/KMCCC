@@ -25,10 +25,13 @@
 		[JsonPropertyName("type")]
 		public string Type { get; set; }
 
-		[JsonPropertyName("minecraftArguments")]
-		public string MinecraftArguments { get; set; }
+        [JsonPropertyName("minecraftArguments")]
+        public string MinecraftArguments { get; set; }
 
-		[JsonPropertyName("minimumLauncherVersion")]
+        [JsonPropertyName("arguments")]
+        public JArguments arguments { get; set; }
+
+        [JsonPropertyName("minimumLauncherVersion")]
 		public int MinimumLauncherVersion { get; set; }
 
 		[JsonPropertyName("libraries")]
@@ -65,7 +68,16 @@
 		public JExtract Extract { get; set; }
 	}
 
-	public class JRule
+    public class JArguments
+    {
+        [JsonPropertyName("game")]
+        public object[] game { get; set; }
+
+        [JsonPropertyName("jvm")]
+        public object[] jvm { get; set; }
+    }
+
+    public class JRule
 	{
 		[JsonPropertyName("action")]
 		public string Action { get; set; }

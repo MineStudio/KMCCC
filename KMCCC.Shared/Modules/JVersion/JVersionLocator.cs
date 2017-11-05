@@ -95,10 +95,10 @@
 				{
 					return null;
 				}
-				if (string.IsNullOrWhiteSpace(jver.MinecraftArguments))
-				{
-					return null;
-				}
+                if (jver.arguments == null && string.IsNullOrWhiteSpace(jver.MinecraftArguments))
+                {
+                    return null;
+                }
 				if (string.IsNullOrWhiteSpace(jver.MainClass))
 				{
 					return null;
@@ -112,8 +112,8 @@
 					return null;
 				}
 				version.Id = jver.Id;
-				version.MinecraftArguments = jver.MinecraftArguments;
-				version.Assets = jver.Assets;
+                version.MinecraftArguments = jver.MinecraftArguments ?? UsefulTools.PrintfArray(jver.arguments.game);
+                version.Assets = jver.Assets;
 				version.MainClass = jver.MainClass;
 				version.JarId = jver.JarId;
 				version.Libraries = new List<Library>();

@@ -47,10 +47,15 @@
 		/// </summary>
 		public string MinecraftArguments { get; set; }
 
-		/// <summary>
-		///     资源名
-		/// </summary>
-		public string Assets { get; set; }
+        /// <summary>
+        ///     主启动参数（新版本）
+        /// </summary>
+        public arguments NewMinecraftArguments { get; set; }
+
+        /// <summary>
+        ///     资源名
+        /// </summary>
+        public string Assets { get; set; }
 
 		/// <summary>
 		///     主类
@@ -92,12 +97,54 @@
 		///     Version
 		/// </summary>
 		public string Version { get; set; }
-	}
 
-	/// <summary>
-	///     表示本机实现
-	/// </summary>
-	public class Native
+        /// <summary>
+        ///     Url
+        /// </summary>
+        public string Url { get; set; }
+
+        /// <summary>
+        ///     checksums
+        /// </summary>
+        public string[] checksums { get; set; }
+
+        /// <summary>
+        ///     serverreq
+        /// </summary>
+        public bool serverreq { get; set; } = true;
+
+        public bool clientreq { get; set; } = true;
+    }
+
+    /// <summary>
+    ///     表示启动参数（新格式）
+    /// </summary>
+    public class arguments
+    {
+        public List<_game> game { get; set; }
+        public _jvm jvm { get; set; }
+    }
+
+    /// <summary>
+    ///     表示启动参数游戏部分
+    /// </summary>
+    public class _game
+    {
+
+    }
+
+    /// <summary>
+    ///     表示启动参数jvm虚拟机部分
+    /// </summary>
+    public class _jvm
+    {
+
+    }
+
+    /// <summary>
+    ///     表示本机实现
+    /// </summary>
+    public class Native
 	{
 		/// <summary>
 		///     NS
