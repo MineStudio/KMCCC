@@ -84,7 +84,9 @@ namespace KMCCC.Authentication
 		public AuthenticationInfo Do()
 		{
 			var client = new YggdrasilClient(AuthServer, ClientToken);
-			if (client.Authenticate(Email, Password, Token, TwitchEnabled))
+            var LoginError = client.Authenticate(Email, Password, Token, TwitchEnabled);
+
+            if (LoginError==null)
 			{
 				return new AuthenticationInfo
 				{
@@ -97,7 +99,7 @@ namespace KMCCC.Authentication
 			}
 			return new AuthenticationInfo
 			{
-				Error = "验证错误"
+				Error = LoginError.Message
 			};
 		}
 
@@ -119,7 +121,7 @@ namespace KMCCC.Authentication
 				}
 				return new AuthenticationInfo
 				{
-					Error = "验证错误"
+					Error = task.Exception.Message
 				};
 			}, token);
 		}

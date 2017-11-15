@@ -208,7 +208,17 @@
 			return String.Format(@"{0}\versions\{1}\{1}.json", core.GameRootPath, versionId);
 		}
 
-		public static string GetLibPath(this LauncherCore core, Library lib)
+        public static string GetVersionOptions(this LauncherCore core, Version version)
+        {
+            return GetVersionOptions(core, version.Id);
+        }
+
+        public static string GetVersionOptions(this LauncherCore core, string versionId)
+        {
+            return String.Format(@"{0}\versions\{1}\options.txt", core.GameRootPath, versionId);
+        }
+
+        public static string GetLibPath(this LauncherCore core, Library lib)
 		{
 			return String.Format(@"{0}\libraries\{1}\{2}\{3}\{2}-{3}.jar", core.GameRootPath, lib.NS.Replace(".", "\\"), lib.Name, lib.Version);
 		}

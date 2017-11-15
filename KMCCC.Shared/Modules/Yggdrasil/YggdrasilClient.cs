@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LitJson;
+using System.IO;
 
 namespace KMCCC.Modules.Yggdrasil
 {
@@ -151,7 +152,7 @@ namespace KMCCC.Modules.Yggdrasil
 
 		#region Authenticate
 
-		public bool Authenticate(string email, string password, string ExToken = null, bool twitchEnabled = true)
+		public Exception Authenticate(string email, string password, string ExToken = null, bool twitchEnabled = true)
 		{
 			lock (_locker)
 			{
@@ -173,20 +174,32 @@ namespace KMCCC.Modules.Yggdrasil
 					var response = JsonMapper.ToObject<AuthenticationResponse>(responseBody);
 					if (response.AccessToken == null)
 					{
-						return false;
+						return new Exception("获取AccessToken失败");
 					}
 					if (response.SelectedProfile == null)
 					{
-						return false;
+						return new Exception("获取SelectedProfile失败，可能该账号没有购买游戏");
 					}
 					UpdateFomrResponse(response);
-					return true;
+					return null;
 				}
-				catch (Exception)
-				{
-					return false;
-				}
-			}
+                catch (WebException ex)
+                {
+                    try
+                    {
+                        using (StreamReader sr = new StreamReader(((HttpWebResponse)ex.Response).GetResponseStream(), true))
+                        {
+
+                            var ErrorJson = JsonMapper.ToObject<AuthenticationResponse>(sr.ReadToEnd());
+                            return new Exception(ErrorJson.ErrorMessage);
+                        }
+                    }
+                    catch
+                    {
+                        return ex;
+                    }
+                }
+            }
 		}
 
 		public Task<bool> AuthenticateAsync(string email, string password, string ExToken = null, bool twitchEnabled = true,
@@ -307,9 +320,9 @@ namespace KMCCC.Modules.Yggdrasil
 		public string Cause { get; set; }
 	}
 
-	#endregion
+    #endregion
 
-	public class Agent
+    public class Agent
 	{
 		public static readonly Agent Minecraft = new Agent {Name = "Minecraft", Version = 1};
 
