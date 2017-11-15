@@ -5,7 +5,7 @@ using System.Text;
 using LitJson;
 using System.Linq;
 
-namespace KMCCC.Modules.MojangAPI
+namespace KMCCC.Pro.Modules.MojangAPI
 {
     public class MojangAPIInternal : IMojangAPI
     {

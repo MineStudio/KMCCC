@@ -36,11 +36,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modules\JVersion\JVersionLocator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modules\Minecraft\GameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modules\Minecraft\MinecraftPing.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Modules\MojangAPI\MojangAPI.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Modules\MojangAPI\MojangAPIInternal.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Modules\MojangAPI\MojangAPIProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Modules\MojangAPI\ServiceStatus.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Modules\MojangAPI\Statistics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modules\Yggdrasil\YggdrasilClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modules\Zip\ZipArchive.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\MinecraftTools.cs" />

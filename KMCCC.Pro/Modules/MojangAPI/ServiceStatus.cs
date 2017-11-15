@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace KMCCC.Modules.MojangAPI
+namespace KMCCC.Pro.Modules.MojangAPI
 {
     public enum ServiceStatus
     {
