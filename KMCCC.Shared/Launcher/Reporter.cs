@@ -146,18 +146,20 @@
 			{
 				try
 				{
-					var wc = new WebClient();
-					wc.Headers.Add("user-agent", _clientName);
-					wc.UploadString(LAUNCH_REPORT,
-						JsonMapper.ToJson((_reportLevel == ReportLevel.Full)
-							? new FullLaunchReport(core, result, options)
-							: (_reportLevel == ReportLevel.Basic)
-								? new BasicLaunchReport(core, result, options)
-								: new MinLaunchReport(result, options))
+                    using (var wc = new WebClient())
+                    {
+                        wc.Headers.Add("user-agent", _clientName);
+                        wc.UploadString(LAUNCH_REPORT,
+                            JsonMapper.ToJson((_reportLevel == ReportLevel.Full)
+                                ? new FullLaunchReport(core, result, options)
+                                : (_reportLevel == ReportLevel.Basic)
+                                    ? new BasicLaunchReport(core, result, options)
+                                    : new MinLaunchReport(result, options))
 #if DEBUG
-							.Print()
+                            .Print()
 #endif
-						);
+                        );
+                    }
 				}
 				catch
 				{

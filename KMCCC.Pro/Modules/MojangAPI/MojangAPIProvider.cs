@@ -15,6 +15,16 @@ namespace KMCCC.Pro.Modules.MojangAPI
         }
 
         /// <summary>
+        ///     获取指定用户名的UUID
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        public static string NameToUuid(string userName)
+        {
+            return $"https://api.mojang.com/users/profiles/minecraft/{userName}";
+        }
+
+        /// <summary>
         ///     获取指定uuid账户历史名称（GET）
         /// </summary>
         /// <param name="uuid"></param>

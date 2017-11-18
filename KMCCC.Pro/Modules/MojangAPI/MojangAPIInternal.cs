@@ -67,5 +67,20 @@ namespace KMCCC.Pro.Modules.MojangAPI
         }
         #endregion
 
+        public string NameToUUID(string userName)
+        {
+            try
+            {
+                using (WebClient webclient = new WebClient())
+                {
+                    var value = JsonMapper.ToObject(webclient.DownloadString(MojangAPIProvider.NameToUuid(userName)));
+                    return value["id"].ToString();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
