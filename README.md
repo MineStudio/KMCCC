@@ -37,6 +37,7 @@ Professional Version of KMCCC
 ### Included:
 
 - Everything in KMCCC.Shared
+- Mojang API
 - [WIP] Game File Download & Fix & Check (Including Version, Library, Native&Assets)
 - [WIP] More useful extensions for LaunchHandle
 - [WIP] More useful libraries that a launch might need.
