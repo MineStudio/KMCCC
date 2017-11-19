@@ -54,9 +54,9 @@ KMCCC.Basic与KMCCC.Pro共享的代码
 
 LauncherCore core = LauncherCore.Create(
 	new LauncherCoreCreationOption(
-		javaPath: Config.Instance.JavaPath, // by default it will be the first version finded
-		gameRootPath: null, // by defualt it will be ./.minecraft/
-		versionLocator: the Version Locator // by default it will be new JVersionLocator()
+		javaPath: Config.Instance.JavaPath, // 默认为找到的第一个版本
+		gameRootPath: null, // 默认为 ./.minecraft/
+		versionLocator: the Version Locator // 默认情况下将会 new JVersionLocator()
 	));
 
 ```
@@ -80,14 +80,14 @@ var version = core.GetVersion("1.8");
 var result = core.Launch(new LaunchOptions
 {
 	Version = App.LauncherCore.GetVersion(server.VersionId)
-	Authenticator = new OfflineAuthenticator("Steve"), // offline
-	//Authenticator = new YggdrasilLogin("*@*.*", "***", true), // online
-	MaxMemory = Config.Instance.MaxMemory, // optional
-	MinMemory = Config.Instance.MaxMemory, // optional
-	Mode = LaunchMode.MCLauncher, // optional
-	Server = new ServerInfo {Address = "mc.hypixel.net"}, //optional
-	Size = new WindowSize {Height = 768, Width = 1280} //optional
-}, (Action<MinecraftLaunchArguments>) (x => { })); // optional ( modify arguments before launching
+	Authenticator = new OfflineAuthenticator("Steve"), // 离线模式启动
+	//Authenticator = new YggdrasilLogin("*@*.*", "***", true), // 在线模式
+	MaxMemory = Config.Instance.MaxMemory, // 可选
+	MinMemory = Config.Instance.MaxMemory, // 可选
+	Mode = LaunchMode.MCLauncher, // 可选
+	Server = new ServerInfo {Address = "mc.hypixel.net"}, //可选
+	Size = new WindowSize {Height = 768, Width = 1280} //可选
+}, (Action<MinecraftLaunchArguments>) (x => { })); // 可选 ( 启动前修改参数
 ```
 
 ## 使用匿名报告 ##
