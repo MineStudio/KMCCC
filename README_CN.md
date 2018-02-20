@@ -55,9 +55,9 @@ __C#__
 
 LauncherCore core = LauncherCore.Create(
 	new LauncherCoreCreationOption(
-		javaPath: Config.Instance.JavaPath, // by default it will be the first version finded
-		gameRootPath: null, // by defualt it will be ./.minecraft/
-		versionLocator: the Version Locator // by default it will be new JVersionLocator()
+		javaPath: Config.Instance.JavaPath, // 默认为找到的第一个版本
+		gameRootPath: null, // 默认为 ./.minecraft/
+		versionLocator: the Version Locator // 默认情况下将会 new JVersionLocator()
 	));
 
 ```
@@ -66,9 +66,9 @@ __VB__
 ```vb
 Dim core = LauncherCore.Create(
     New LauncherCoreCreationOption(
-        javaPath:=Config.Instance.JavaPath, ' by default it will be the first version finded
-        gameRootPath:=Nothing, ' by defualt it will be ./.minecraft/
-        versionLocator:=theVersionLocator ' by default it will be New JVersionLocator()
+        javaPath:=Config.Instance.JavaPath, ' 默认为找到的第一个版本
+        gameRootPath:=Nothing, ' 默认为 ./.minecraft/
+        versionLocator:=theVersionLocator ' 默认情况下将会 New JVersionLocator()
     ))
 ```
 
