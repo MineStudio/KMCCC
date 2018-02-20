@@ -52,6 +52,7 @@ We plan to delay some parameter settings, (such as versionLocator) and make more
 
 ## How to initialize a LauncherCore
 
+__C#__
 ```csharp
 
 LauncherCore core = LauncherCore.Create(
@@ -63,8 +64,19 @@ LauncherCore core = LauncherCore.Create(
 
 ```
 
+__VB__
+```vb
+Dim core = LauncherCore.Create(
+    New LauncherCoreCreationOption(
+        javaPath:=Config.Instance.JavaPath, ' by default it will be the first version finded
+        gameRootPath:=Nothing, ' by defualt it will be ./.minecraft/
+        versionLocator:=theVersionLocator ' by default it will be New JVersionLocator()
+    ))
+```
+
 ## How to find Versions
 
+__C#__
 ```csharp
 
 var versions = core.GetVersions();
@@ -73,15 +85,24 @@ var version = core.GetVersion("1.8");
 
 ```
 
+__VB__
+```vb
+
+Dim versions = core.GetVersions
+
+Dim version = core.GetVersion("1.8")
+
+```
+
 *unlaunchable Version will be ignored*
 
 ## How to launch Minecraft
 
-
+__C#__
 ```csharp
 var result = core.Launch(new LaunchOptions
 {
-	Version = App.LauncherCore.GetVersion(server.VersionId)
+	Version = App.LauncherCore.GetVersion(server.VersionId),
 	Authenticator = new OfflineAuthenticator("Steve"), // offline
 	//Authenticator = new YggdrasilLogin("*@*.*", "***", true), // online
 	MaxMemory = Config.Instance.MaxMemory, // optional
@@ -92,14 +113,39 @@ var result = core.Launch(new LaunchOptions
 }, (Action<MinecraftLaunchArguments>) (x => { })); // optional ( modify arguments before launching
 ```
 
+__VB__
+```vb
+Dim result = core.Launch(New LaunchOptions With
+{
+    .Version = App.LauncherCore.GetVersion(server.VersionId),
+    .Authenticator = New OfflineAuthenticator("Steve"), ' offline. New YggdrasilLogin("*@*.*", "***", True), for online scenario.
+    .MaxMemory = Config.Instance.MaxMemory, ' optional
+    .MinMemory = Config.Instance.MaxMemory, ' optional
+    .Mode = LaunchMode.MCLauncher, ' optional
+    .Server = New ServerInfo With {.Address = "mc.hypixel.net"}, 'optional
+    .Size = New WindowSize With {.Height = 768, .Width = 1280} 'optional
+}, Sub(x As MinecraftLaunchArguments)
+   End Sub) ' optional ( modify arguments before launching
+```
+
 ## Using anonymous report ##
 
+__C#__
 ```csharp
 Reporter.SetClientName("Your launcher's name"); // set name
 Reporter.SetReportLevel(ReportLevel.Full); // full report
 //Reporter.SetReportLevel(ReportLevel.Basic); // basic report
 //Reporter.SetReportLevel(ReportLevel.Min); // simplified report
 //Reporter.SetReportLevel(ReportLevel.None); // turn off
+```
+
+__VB__
+```vb
+Reporter.SetClientName("Your launcher's name") ' set name
+Reporter.SetReportLevel(ReportLevel.Full) ' full report
+'Reporter.SetReportLevel(ReportLevel.Basic) ' basic report
+'Reporter.SetReportLevel(ReportLevel.Min) ' simplified report
+'Reporter.SetReportLevel(ReportLevel.None) ' turn off
 ```
 
 # Enjoy!
