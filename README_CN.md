@@ -130,7 +130,7 @@ Dim result = core.Launch(New LaunchOptions With
 
 __C#__
 ```csharp
-Reporter.SetClientName("Your launcher's name"); // 设置启动器名字
+Reporter.SetClientName("你的启动器名字"); // 设置启动器名字
 Reporter.SetReportLevel(ReportLevel.Full); // 报告所有信息
 //Reporter.SetReportLevel(ReportLevel.Basic); // 报告基本信息
 //Reporter.SetReportLevel(ReportLevel.Min); // 报告非常少的信息
@@ -139,7 +139,7 @@ Reporter.SetReportLevel(ReportLevel.Full); // 报告所有信息
 
 __VB__
 ```vb
-Reporter.SetClientName("Your launcher's name") ' 设置启动器名字
+Reporter.SetClientName("你的启动器名字") ' 设置启动器名字
 Reporter.SetReportLevel(ReportLevel.Full) ' 报告所有信息
 'Reporter.SetReportLevel(ReportLevel.Basic) ' 报告基本信息
 'Reporter.SetReportLevel(ReportLevel.Min) ' 报告非常少的信息
