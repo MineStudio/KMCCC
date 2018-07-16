@@ -91,9 +91,10 @@
 			}
 			else
 			{
-				Core.Log(this, e.Data);
-			}
-		}
+                Core.Log(this, e.Data);
+            }
+            e = null;
+        }
 
 		private void Error(object sender, DataReceivedEventArgs e)
 		{
@@ -103,13 +104,14 @@
 			}
 			else
 			{
-				Core.Log(this, e.Data);
+                Core.Log(this, e.Data);
 			}
-		}
+            e = null;
+        }
 
 		internal void Work()
 		{
-			Process.BeginOutputReadLine();
+            Process.BeginOutputReadLine();
 			Process.OutputDataReceived += Output;
 			Process.BeginErrorReadLine();
 			Process.ErrorDataReceived += Error;

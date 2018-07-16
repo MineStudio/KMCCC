@@ -217,9 +217,11 @@ namespace KMCCC.Modules.Yggdrasil
                         }
                         else
                         {
-                            StreamReader sr = new StreamReader(hwr.GetResponseStream());
-                            var response = JsonMapper.ToObject<Error>(sr.ReadToEnd());
-                            return new Exception(response.ErrorMessage);
+                            using (StreamReader sr = new StreamReader(hwr.GetResponseStream()))
+                            {
+                                var response = JsonMapper.ToObject<Error>(sr.ReadToEnd());
+                                return new Exception(response.ErrorMessage);
+                            }
                         }
                     }   
                 }
@@ -305,41 +307,43 @@ namespace KMCCC.Modules.Yggdrasil
 			var task = new TaskCompletionSource<bool>(token);
 			try
 			{
-				var wc = new WebClient();
-				var requestBody = JsonMapper.ToJson(new AuthenticationRequest
-				{
-					Agent = Agent.Minecraft,
-					Email = email,
-					Password = password,
-					RequestUser = twitchEnabled,
-                    token = ExToken,
-                    ClientToken = ClientToken.ToString("N")
-				});
-				wc.UploadStringCompleted += (sender, e) =>
-				{
-					try
-					{
-						if (e.Error != null)
-						{
-							task.SetException(e.Error);
-							return;
-						}
-						var response = JsonMapper.ToObject<AuthenticationResponse>(e.Result);
-						if ((response.AccessToken == null) || (response.SelectedProfile == null))
-						{
-							task.SetResult(false);
-							return;
-						}
-						UpdateFomrResponse(response);
-						task.SetResult(true);
-					}
-					catch (Exception exception)
-					{
-						task.SetException(exception);
-					}
-				};
-				wc.UploadStringAsync(new Uri(Auth_Authentication), requestBody);
-				return task.Task;
+                using (var wc = new WebClient())
+                {
+                    var requestBody = JsonMapper.ToJson(new AuthenticationRequest
+                    {
+                        Agent = Agent.Minecraft,
+                        Email = email,
+                        Password = password,
+                        RequestUser = twitchEnabled,
+                        token = ExToken,
+                        ClientToken = ClientToken.ToString("N")
+                    });
+                    wc.UploadStringCompleted += (sender, e) =>
+                    {
+                        try
+                        {
+                            if (e.Error != null)
+                            {
+                                task.SetException(e.Error);
+                                return;
+                            }
+                            var response = JsonMapper.ToObject<AuthenticationResponse>(e.Result);
+                            if ((response.AccessToken == null) || (response.SelectedProfile == null))
+                            {
+                                task.SetResult(false);
+                                return;
+                            }
+                            UpdateFomrResponse(response);
+                            task.SetResult(true);
+                        }
+                        catch (Exception exception)
+                        {
+                            task.SetException(exception);
+                        }
+                    };
+                    wc.UploadStringAsync(new Uri(Auth_Authentication), requestBody);
+                    return task.Task;
+                }
 			}
 			catch (Exception exception)
 			{

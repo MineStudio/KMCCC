@@ -48,7 +48,7 @@ namespace KMCCC.Pro.Modules.MojangAPI
 
         public override string ToString()
         {
-            return $"SalesStatistics [total={total}, last24h={last24h}, saleVelocityPerSeconds={saleVelocityPerSeconds}]";
+            return string.Format("SalesStatistics [total={0}, last24h={1}, saleVelocityPerSeconds={2}]", total, last24h, saleVelocityPerSeconds);
         }
     }
     public static class MetricKeys

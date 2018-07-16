@@ -48,19 +48,24 @@
 		public string MinecraftArguments { get; set; }
 
         /// <summary>
-        ///     主启动参数（新版本）
+        ///     游戏主文件下载信息
         /// </summary>
-        public arguments NewMinecraftArguments { get; set; }
+        public Download Downloads { get; set; }
 
         /// <summary>
         ///     资源名
         /// </summary>
         public string Assets { get; set; }
 
-		/// <summary>
-		///     主类
-		/// </summary>
-		public string MainClass { get; set; }
+        /// <summary>
+        ///    资源文件信息（新版本）
+        /// </summary>
+        public GameFileInfo AssetsIndex { get; set; }
+
+        /// <summary>
+        ///     主类
+        /// </summary>
+        public string MainClass { get; set; }
 
 		/// <summary>
 		///     库列表
@@ -72,10 +77,10 @@
 		/// </summary>
 		public List<Native> Natives { get; set; }
 
-		/// <summary>
-		///     Jar文件（Id）
-		/// </summary>
-		public string JarId { get; set; }
+        /// <summary>
+        ///     Jar文件（Id）
+        /// </summary>
+        public string JarId { get; set; }
 	}
 
 	/// <summary>
@@ -116,29 +121,44 @@
         public bool clientreq { get; set; } = true;
     }
 
-    /// <summary>
-    ///     表示启动参数（新格式）
-    /// </summary>
-    public class arguments
+    public class GameFileInfo
     {
-        public List<_game> game { get; set; }
-        public _jvm jvm { get; set; }
+        /// <summary>
+        ///     Assets Dd
+        /// </summary>
+        public string ID { get; set; }
+
+        /// <summary>
+        ///     文件SHA1
+        /// </summary>
+        public string SHA1 { get; set; }
+
+        /// <summary>
+        ///     AssetsIndex或Lib文件大小
+        /// </summary>
+        public int Size { get; set; }
+
+        /// <summary>
+        ///     AssetsIndex或Lib下载地址
+        /// </summary>
+        public string Url { get; set; }
+
+        /// <summary>
+        ///     Assets总文件大小
+        /// </summary>
+        public int TotalSize { get; set; }
+
+        /// <summary>
+        ///     Lib文件目录
+        /// </summary>
+        public string Path { get; set; }
     }
 
-    /// <summary>
-    ///     表示启动参数游戏部分
-    /// </summary>
-    public class _game
+    public class Download
     {
+        public GameFileInfo Client { get; set; }
 
-    }
-
-    /// <summary>
-    ///     表示启动参数jvm虚拟机部分
-    /// </summary>
-    public class _jvm
-    {
-
+        public GameFileInfo Server { get; set; }
     }
 
     /// <summary>

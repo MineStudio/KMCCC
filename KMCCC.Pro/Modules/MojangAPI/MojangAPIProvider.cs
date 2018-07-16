@@ -19,9 +19,9 @@ namespace KMCCC.Pro.Modules.MojangAPI
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
-        public static string NameToUuid(string userName)
+        public static string nameToUuid(string userName)
         {
-            return $"https://api.mojang.com/users/profiles/minecraft/{userName}";
+            return "https://api.mojang.com/users/profiles/minecraft/"+userName;
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace KMCCC.Pro.Modules.MojangAPI
         /// <returns></returns>
         public static string historyName(Guid uuid)
         {
-            return $"https://api.mojang.com/user/profiles/{uuid}/names";
+            return string.Format("https://api.mojang.com/user/profiles/{0}/names",uuid);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace KMCCC.Pro.Modules.MojangAPI
         ///     获取销量等信息（POST）
         /// </summary>
         /// <returns></returns>
-        public static string Statistics()
+        public static string statistics()
         {
             return "https://api.mojang.com/orders/statistics";
         }

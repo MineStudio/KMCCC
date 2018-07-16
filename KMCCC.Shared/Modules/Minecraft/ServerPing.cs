@@ -5,25 +5,16 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace KMCCC.Modules.Minecraft
 {
     /// <summary>
     /// Minecraft Ping based off https://gist.github.com/Fireflies/2480d14fbbb33b4bbae3
     /// </summary>
-    public class MinecraftPing
+    public class ServerPing
     {
 
-        #region events
-        public delegate void OnErrorHandler(string error);
-        public event OnErrorHandler OnError;
-
-        public delegate void OnEventHandler(Events action);
-        public event OnEventHandler OnEvent;
-
-        public delegate void OnPingReceivendEvent(PingPayload payload);
-        public event OnPingReceivendEvent OnPingReceived;
-        #endregion
         private static NetworkStream _stream;
         private static List<byte> _buffer;
         private static int _offset;
@@ -31,76 +22,81 @@ namespace KMCCC.Modules.Minecraft
         private readonly string _server;
         private readonly int _port;
 
-        public MinecraftPing(string server, int port)
+        public ServerPing(string server, int port)
         {
             _server = server;
             _port = port;
         }
 
-        public void Ping()
+        public PingPayload Ping()
         {
-            var client = new TcpClient();
-            client.Connect(_server, _port);
 
-            
-
-            if (!client.Connected)
+            using (var client = new TcpClient())
             {
-                OnError?.Invoke("Error connecting to server");
-            }
+                client.Connect(_server, _port);
+                if (!client.Connected)
+                {
+                    client.Client.Disconnect(false);
+                    return new PingPayload() { error = "服务器连接失败" };
+                }
 
-            _buffer = new List<byte>();
-            _stream = client.GetStream();
-            OnEvent?.Invoke(Events.SendingStatusRequest);
+                _buffer = new List<byte>();
+                _stream = client.GetStream();
 
 
-            /*
-             * Send a "Handshake" packet
-             * http://wiki.vg/Server_List_Ping#Ping_Process
-             */
-            WriteVarInt(47);
-            WriteString(_server);
-            WriteShort((short)_port);
-            WriteVarInt(1);
-            Flush(0);
+                /*
+                 * Send a "Handshake" packet
+                 * http://wiki.vg/Server_List_Ping#Ping_Process
+                 */
+                WriteVarInt(47);
+                WriteString(_server);
+                WriteShort((short)_port);
+                WriteVarInt(1);
+                Flush(0);
 
-            /*
-             * Send a "Status Request" packet
-             * http://wiki.vg/Server_List_Ping#Ping_Process
-             */
-            Flush(0);
+                /*
+                 * Send a "Status Request" packet
+                 * http://wiki.vg/Server_List_Ping#Ping_Process
+                 */
+                Flush(0);
 
-            var buffer = new byte[4096];
-            _stream.Read(buffer, 0, buffer.Length);
+                var buffer = new byte[8192];
+                _stream.Read(buffer, 0, buffer.Length);
 
-            try
-            {
-                //var length = ReadVarInt(buffer);
-                //var packet = ReadVarInt(buffer);
-                //var jsonLength = ReadVarInt(buffer);
-
-                //var json = ReadString(buffer, jsonLength);
-                var json = ReadString(buffer, buffer.Length);
-                var safejson = "{" + json.Substring(json.IndexOf('{') + 1);
-                if (!safejson.EndsWith("\"}"))
-                    safejson += "\"}";
                 try
                 {
-                    OnPingReceived?.Invoke(JsonMapper.ToObject<PingPayload>(safejson));
-                }
-                catch
-                {
-                    OnPingReceived?.Invoke(new PingPayload { description = new Description { text = safejson } });
-                }
-            }
-            catch (IOException ex)
-            {
-                OnError?.Invoke(ex.Message);
-            }
+                    var json = ReadString(buffer, buffer.Length);
+                    var safejson = "{" + json.Substring(json.IndexOf('{') + 1);
+                    client.Client.Disconnect(false);
+                    
+                    if (!safejson.EndsWith("\"}"))
+                        safejson += "\"}";
+                    
+                    
 
-            OnEvent?.Invoke(Events.Disconnecting);
-            client.Client.Disconnect(false);
-            client.Close();
+                    try
+                    {
+                        return JsonMapper.ToObject<PingPayload>(safejson);
+                    }
+                    catch(Exception ex)
+                    {
+                        return new PingPayload { description = new Description { text = safejson } };
+                    }
+                }
+                catch (IOException ex)
+                {
+                    client.Client.Disconnect(false);
+                    return new PingPayload()
+                    {
+                        error = "服务器连接失败"
+                    };
+                }
+            }
+        }
+
+        public Task<PingPayload> PingAsync(CancellationToken token = default(CancellationToken))
+        {
+            return Task<PingPayload>.Factory.StartNew(Ping, token);
         }
 
         /*
@@ -133,7 +129,7 @@ namespace KMCCC.Modules.Minecraft
         }
         //*/
 
-        #region Read/Write methods
+        #region 读取/写入 methods
         internal static byte ReadByte(byte[] buffer)
         {
             var b = buffer[_offset];
@@ -159,7 +155,7 @@ namespace KMCCC.Modules.Minecraft
 
         internal static string ReadString(byte[] buffer, int length)
         {
-            return Encoding.UTF8.GetString(buffer);
+            return Encoding.UTF8.GetString(buffer,3,length-3).TrimEnd('\0');
         }
 
         internal static void WriteVarInt(int value)
@@ -215,28 +211,44 @@ namespace KMCCC.Modules.Minecraft
         #endregion
     }
 
-    #region Events
-
-    public enum Events
-    {
-        Connecting,
-        SendingStatusRequest,
-        Disconnecting
-    }
-    #endregion
 
     #region Server ping 
     /// <summary>
     /// C# represenation of the following JSON file
     /// https://gist.github.com/thinkofdeath/6927216
+    /// 参数信息请参见 http://wiki.vg/Server_List_Ping
     /// </summary>
     public class PingPayload
     {
+        /// <summary>
+        /// 服务器版本
+        /// </summary>
         public Version version { get; set; }
+
+        /// <summary>
+        /// 服务器玩家
+        /// </summary>
         public Players players { get; set; }
+
+        /// <summary>
+        /// 服务器信息
+        /// </summary>
         public Description description { get; set; }
+
+        /// <summary>
+        /// 服务器Mod信息
+        /// </summary>
         public Modinfo modinfo { get; set; }
-        public string favicon { get; set; }
+
+        /// <summary>
+        /// 服务器图标
+        /// </summary>
+        public string favicon { get; set; } = null;
+
+        /// <summary>
+        /// 错误信息（如果有）
+        /// </summary>
+        public string error { get; set; } = null;
     }
 
     public class Version
@@ -249,6 +261,7 @@ namespace KMCCC.Modules.Minecraft
     {
         public int max { get; set; }
         public int online { get; set; }
+        public List<object> sample { get; set; }
     }
 
     public class Extra

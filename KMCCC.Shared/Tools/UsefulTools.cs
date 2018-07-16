@@ -78,7 +78,7 @@
         public static string PrintfArray(object[] obj)
         {
             StringBuilder printf = new StringBuilder();
-            obj.ToList().ForEach(a => { if (a.GetType() == typeof(string)) { printf.Append($" {a}"); } });
+            obj.ToList().ForEach(a => { if (a.GetType() == typeof(string)) { printf.Append(" "+a); } });
             return printf.ToString();
         }
 

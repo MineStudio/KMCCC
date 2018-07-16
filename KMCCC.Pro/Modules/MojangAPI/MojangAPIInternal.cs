@@ -56,7 +56,7 @@ namespace KMCCC.Pro.Modules.MojangAPI
                         MetricKeys.PREPAID_CARD_REDEEMED_MINECRAFT
                     };
                     data["metricKeys"] = metricKey_sdata;
-                    var value = JsonMapper.ToObject(webclient.UploadString(MojangAPIProvider.Statistics(), data.ToJson()));
+                    var value = JsonMapper.ToObject(webclient.UploadString(MojangAPIProvider.statistics(), data.ToJson()));
                     return new Statistics(long.Parse(value[0].ToString()), long.Parse(value[1].ToString()), double.Parse(value[2].ToString()));
                 }
             }
@@ -67,14 +67,15 @@ namespace KMCCC.Pro.Modules.MojangAPI
         }
         #endregion
 
-        public string NameToUUID(string userName)
+        #region 通过名字获取UUID
+        public Guid NameToUUID(string userName)
         {
             try
             {
                 using (WebClient webclient = new WebClient())
                 {
-                    var value = JsonMapper.ToObject(webclient.DownloadString(MojangAPIProvider.NameToUuid(userName)));
-                    return value["id"].ToString();
+                    var value = JsonMapper.ToObject(webclient.DownloadString(MojangAPIProvider.nameToUuid(userName)));
+                    return Guid.Parse(value["id"].ToString());
                 }
             }
             catch(Exception ex)
@@ -82,5 +83,6 @@ namespace KMCCC.Pro.Modules.MojangAPI
                 throw ex;
             }
         }
+        #endregion
     }
 }
