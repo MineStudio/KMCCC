@@ -127,18 +127,18 @@
                 {
                     version.Downloads = new Download()
                     {
-                        Client = new GameFileInfo()
+                        Client = jver.Downloads.Client != null ? new GameFileInfo()
                         {
                             SHA1 = jver.Downloads.Client.SHA1,
                             Size = jver.Downloads.Client.Size,
                             Url = jver.Downloads.Client.Url
-                        },
-                        Server = new GameFileInfo()
+                        } : null,
+                        Server = jver.Downloads.Server != null ? new GameFileInfo()
                         {
                             SHA1 = jver.Downloads.Server.SHA1,
                             Size = jver.Downloads.Server.Size,
                             Url = jver.Downloads.Server.Url
-                        }
+                        } : null
                     };
                 }
                 version.MinecraftArguments = jver.MinecraftArguments ?? UsefulTools.PrintfArray(jver.arguments.game);
@@ -215,35 +215,12 @@
                     }
 				}
 
-                version.AssetsIndex = new GameFileInfo()
-                {
-                    ID = version.AssetsIndex.ID,
-                    SHA1 = version.AssetsIndex.SHA1,
-                    Size = version.AssetsIndex.Size,
-                    TotalSize = version.AssetsIndex.TotalSize,
-                    Url = version.AssetsIndex.Url
-                };
-                version.Downloads = new Download()
-                {
-                    Client = new GameFileInfo()
-                    {
-                        SHA1 = version.Downloads.Client.SHA1,
-                        Size = version.Downloads.Client.Size,
-                        Url = version.Downloads.Client.Url
-                    },
-                    Server = new GameFileInfo()
-                    {
-                        SHA1 = version.Downloads.Server.SHA1,
-                        Size = version.Downloads.Server.Size,
-                        Url = version.Downloads.Server.Url
-                    },
-                };
 
                 version.JarId = version.JarId ?? version.Id;
 				_versions.Add(version.Id, version);
 				return version;
 			}
-			catch
+			catch(System.Exception ex)
 			{
 				return null;
 			}
