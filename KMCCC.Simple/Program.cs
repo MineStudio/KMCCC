@@ -41,6 +41,7 @@
 
             }
 
+            /*
             try
             {
                 var ping = new ServerPing("mc.hypixel.net", 25565);
@@ -50,11 +51,13 @@
                 Console.WriteLine("{0} / {1}", server.players.online, server.players.max);
                 Console.WriteLine(server.version.name);
                 Console.WriteLine(server.modinfo);
+                
             }
             catch(Exception ex)
             {
                 Console.WriteLine("服务器信息获取失败:"+ex.Message+"\n"+ Timer.ToString());
             }
+            */
 
             Console.WriteLine("初始化"+Timer.ToString());
             using (_fs = new FileStream("mc.log", FileMode.Create))
