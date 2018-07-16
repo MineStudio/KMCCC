@@ -78,13 +78,12 @@
 				}
 				_locatingVersion.Add(id);
 
-				Version version;
-				if (_versions.TryGetValue(id, out version))
-				{
-					return version;
-				}
+                if (_versions.TryGetValue(id, out Version version))
+                {
+                    return version;
+                }
 
-				var jver = LoadVersion(_core.GetVersionJsonPath(id));
+                var jver = LoadVersion(_core.GetVersionJsonPath(id));
 				if (jver == null)
 				{
 					return null;
@@ -162,7 +161,30 @@
 						}
 					}
 				}
-				if (jver.InheritsVersion != null)
+                version.AssetsIndex = new GameFileInfo()
+                {
+                    ID = jver.AssetsIndex.ID,
+                    SHA1 = jver.AssetsIndex.SHA1,
+                    Size = jver.AssetsIndex.Size,
+                    TotalSize = jver.AssetsIndex.TotalSize,
+                    Url = jver.AssetsIndex.Url
+                };
+                version.Downloads = new Download()
+                {
+                    Client = new GameFileInfo()
+                    {
+                        SHA1 = jver.Downloads.Client.SHA1,
+                        Size = jver.Downloads.Client.Size,
+                        Url = jver.Downloads.Client.Url
+                    },
+                    Server = new GameFileInfo()
+                    {
+                        SHA1 = jver.Downloads.Server.SHA1,
+                        Size = jver.Downloads.Server.Size,
+                        Url = jver.Downloads.Server.Url
+                    },
+                };
+                if (jver.InheritsVersion != null)
 				{
 					var target = GetVersionInternal(jver.InheritsVersion);
 					if (target == null)
@@ -179,9 +201,10 @@
 						version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
 						version.Natives.AddRange(target.Natives);
 						version.Libraries.AddRange(target.Libraries);
-					}
+                        version.AssetsIndex = version.AssetsIndex ?? target.AssetsIndex;
+                    }
 				}
-				version.JarId = version.JarId ?? version.Id;
+                version.JarId = version.JarId ?? version.Id;
 				_versions.Add(version.Id, version);
 				return version;
 			}

@@ -105,11 +105,8 @@
 				{
 					try
 					{
-						if (opt != null)
-						{
-							opt(args);
-						}
-					}
+                        opt?.Invoke(args);
+                    }
 					catch (Exception exp)
 					{
 						return new LaunchResult {Success = false, ErrorType = ErrorType.OperatorException, ErrorMessage = "指定的操作器引发了异常", Exception = exp};
@@ -199,7 +196,8 @@
 		{
 			if (GameLog != null)
 			{
-				GameLog(handle, line);
+                //Console.WriteLine(line);
+                GameLog(handle, line);
 			}
 		}
 
@@ -207,8 +205,8 @@
 		{
 			if (GameExit != null)
 			{
-				GameExit(handle, code);
-			}
+                GameExit(handle, code);
+            }
 		}
 
 		#endregion

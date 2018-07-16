@@ -172,3 +172,8 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+*.ide
+.gitignore
+/.vs/KMCCC
+/KMCCC.Shared/Modules/Minecraft/GameOptions.cs
+/KMCCC.Shared/Tools/MinecraftTools.cs

@@ -10,7 +10,7 @@ namespace KMCCC.Pro.Modules.MojangAPI
 
         Statistics GetStatistics();
 
-        string NameToUUID(string userName);
+        Guid NameToUUID(string userName);
     }
 
     public class MojangAPI
@@ -18,7 +18,7 @@ namespace KMCCC.Pro.Modules.MojangAPI
         private static IMojangAPI Api  = Api ?? new MojangAPIInternal();
 
         /// <summary>
-        ///     获取MojangAPI服务状态
+        ///     获取MojangAPI服务状态，如果获取失败将抛异常
         /// </summary>
         /// <returns></returns>
         public static Dictionary<string, ServiceStatus> GetServiceStatus()
@@ -27,7 +27,7 @@ namespace KMCCC.Pro.Modules.MojangAPI
         }
 
         /// <summary>
-        ///     获取销量等信息
+        ///     获取销量等信息，如果获取失败将抛异常
         /// </summary>
         /// <returns></returns>
         public static Statistics GetStatistics()
@@ -36,11 +36,11 @@ namespace KMCCC.Pro.Modules.MojangAPI
         }
 
         /// <summary>
-        ///     通过用户名获取UUID
+        ///     通过用户名获取UUID，如果获取失败将抛异常
         /// </summary>
         /// <param name="userName">用户名</param>
         /// <returns></returns>
-        public static string NameToUUID(string userName)
+        public static Guid NameToUUID(string userName)
         {
             return Api.NameToUUID(userName);
         }

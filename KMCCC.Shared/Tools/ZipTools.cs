@@ -98,8 +98,8 @@
 						{
 							continue;
 						}
-						if ((bool) ZipFileInfo_FolderFlag.GetValue(item, null))
-						{
+						if ((bool) ZipFileInfo_FolderFlag.GetValue(item, null) || name.Last() == '/')
+                        {
 							Directory.CreateDirectory(rootPath + name);
 							continue;
 						}
