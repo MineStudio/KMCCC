@@ -70,13 +70,13 @@
 		/// <returns>Version的信息</returns>
 		internal Version GetVersionInternal(string id)
 		{
-			try
-			{
-				if (_locatingVersion.Contains(id))
-				{
-					return null;
-				}
-				_locatingVersion.Add(id);
+            try
+            {
+                if (_locatingVersion.Contains(id))
+                {
+                    return null;
+                }
+                _locatingVersion.Add(id);
 
                 if (_versions.TryGetValue(id, out Version version))
                 {
@@ -84,33 +84,63 @@
                 }
 
                 var jver = LoadVersion(_core.GetVersionJsonPath(id));
-				if (jver == null)
-				{
-					return null;
-				}
+                if (jver == null)
+                {
+                    return null;
+                }
 
-				version = new Version();
-				if (string.IsNullOrWhiteSpace(jver.Id))
-				{
-					return null;
-				}
+                version = new Version();
+                if (string.IsNullOrWhiteSpace(jver.Id))
+                {
+                    return null;
+                }
                 if (jver.arguments == null && string.IsNullOrWhiteSpace(jver.MinecraftArguments))
                 {
                     return null;
                 }
-				if (string.IsNullOrWhiteSpace(jver.MainClass))
-				{
-					return null;
-				}
-				if (string.IsNullOrWhiteSpace(jver.Assets))
-				{
-					jver.Assets = "legacy";
-				}
-				if (jver.Libraries == null)
-				{
-					return null;
-				}
-				version.Id = jver.Id;
+                if (string.IsNullOrWhiteSpace(jver.MainClass))
+                {
+                    return null;
+                }
+                if (string.IsNullOrWhiteSpace(jver.Assets))
+                {
+                    jver.Assets = "legacy";
+                }
+                if (jver.Libraries == null)
+                {
+                    return null;
+                }
+                version.Id = jver.Id;
+                if (jver.AssetsIndex != null)
+                {
+                    version.AssetsIndex = new GameFileInfo()
+                    {
+                        ID = jver.AssetsIndex.ID,
+                        Path = jver.AssetsIndex.Path,
+                        SHA1 = jver.AssetsIndex.SHA1,
+                        Size = jver.AssetsIndex.Size,
+                        TotalSize = jver.AssetsIndex.TotalSize,
+                        Url = jver.AssetsIndex.Url
+                    };
+                }
+                if (jver.Downloads != null)
+                {
+                    version.Downloads = new Download()
+                    {
+                        Client = new GameFileInfo()
+                        {
+                            SHA1 = jver.Downloads.Client.SHA1,
+                            Size = jver.Downloads.Client.Size,
+                            Url = jver.Downloads.Client.Url
+                        },
+                        Server = new GameFileInfo()
+                        {
+                            SHA1 = jver.Downloads.Server.SHA1,
+                            Size = jver.Downloads.Server.Size,
+                            Url = jver.Downloads.Server.Url
+                        }
+                    };
+                }
                 version.MinecraftArguments = jver.MinecraftArguments ?? UsefulTools.PrintfArray(jver.arguments.game);
                 version.Assets = jver.Assets;
 				version.MainClass = jver.MainClass;
@@ -161,29 +191,7 @@
 						}
 					}
 				}
-                version.AssetsIndex = new GameFileInfo()
-                {
-                    ID = jver.AssetsIndex.ID,
-                    SHA1 = jver.AssetsIndex.SHA1,
-                    Size = jver.AssetsIndex.Size,
-                    TotalSize = jver.AssetsIndex.TotalSize,
-                    Url = jver.AssetsIndex.Url
-                };
-                version.Downloads = new Download()
-                {
-                    Client = new GameFileInfo()
-                    {
-                        SHA1 = jver.Downloads.Client.SHA1,
-                        Size = jver.Downloads.Client.Size,
-                        Url = jver.Downloads.Client.Url
-                    },
-                    Server = new GameFileInfo()
-                    {
-                        SHA1 = jver.Downloads.Server.SHA1,
-                        Size = jver.Downloads.Server.Size,
-                        Url = jver.Downloads.Server.Url
-                    },
-                };
+                
                 if (jver.InheritsVersion != null)
 				{
 					var target = GetVersionInternal(jver.InheritsVersion);
@@ -195,6 +203,8 @@
 					{
                         if (version.Assets == "legacy")
                             version.Assets = null;
+                        version.AssetsIndex = version.AssetsIndex ?? target.AssetsIndex;
+                        version.Downloads = version.Downloads ?? target.Downloads;
                         version.Assets = version.Assets ?? target.Assets;
 						version.JarId = version.JarId ?? target.JarId;
 						version.MainClass = version.MainClass ?? target.MainClass;
@@ -204,6 +214,31 @@
                         version.AssetsIndex = version.AssetsIndex ?? target.AssetsIndex;
                     }
 				}
+
+                version.AssetsIndex = new GameFileInfo()
+                {
+                    ID = version.AssetsIndex.ID,
+                    SHA1 = version.AssetsIndex.SHA1,
+                    Size = version.AssetsIndex.Size,
+                    TotalSize = version.AssetsIndex.TotalSize,
+                    Url = version.AssetsIndex.Url
+                };
+                version.Downloads = new Download()
+                {
+                    Client = new GameFileInfo()
+                    {
+                        SHA1 = version.Downloads.Client.SHA1,
+                        Size = version.Downloads.Client.Size,
+                        Url = version.Downloads.Client.Url
+                    },
+                    Server = new GameFileInfo()
+                    {
+                        SHA1 = version.Downloads.Server.SHA1,
+                        Size = version.Downloads.Server.Size,
+                        Url = version.Downloads.Server.Url
+                    },
+                };
+
                 version.JarId = version.JarId ?? version.Id;
 				_versions.Add(version.Id, version);
 				return version;
