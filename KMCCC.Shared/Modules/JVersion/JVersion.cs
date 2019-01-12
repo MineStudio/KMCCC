@@ -5,13 +5,14 @@
 	using System;
 	using System.Collections.Generic;
 	using LitJson;
+    using KMCCC.Launcher;
 
-	#endregion
+    #endregion
 
-	/// <summary>
-	///     用来Json的实体类
-	/// </summary>
-	public class JVersion
+    /// <summary>
+    ///     用来Json的实体类
+    /// </summary>
+    public class JVersion
 	{
 		[JsonPropertyName("id")]
 		public string Id { get; set; }
@@ -25,10 +26,16 @@
 		[JsonPropertyName("type")]
 		public string Type { get; set; }
 
-		[JsonPropertyName("minecraftArguments")]
-		public string MinecraftArguments { get; set; }
+        [JsonPropertyName("downloads")]
+        public JDownloads Downloads { get; set; }
 
-		[JsonPropertyName("minimumLauncherVersion")]
+        [JsonPropertyName("minecraftArguments")]
+        public string MinecraftArguments { get; set; }
+
+        [JsonPropertyName("arguments")]
+        public JArguments arguments { get; set; }
+
+        [JsonPropertyName("minimumLauncherVersion")]
 		public int MinimumLauncherVersion { get; set; }
 
 		[JsonPropertyName("libraries")]
@@ -40,14 +47,47 @@
 		[JsonPropertyName("assets")]
 		public string Assets { get; set; }
 
-		[JsonPropertyName("inheritsFrom")]
+        [JsonPropertyName("assetIndex")]
+        public JFileInfo AssetsIndex { get; set; }
+
+        [JsonPropertyName("inheritsFrom")]
 		public string InheritsVersion { get; set; }
 
 		[JsonPropertyName("jar")]
 		public string JarId { get; set; }
 	}
 
-	public class JLibrary
+    public class JFileInfo
+    {
+        [JsonPropertyName("id")]
+        public string ID { get; set; }
+
+        [JsonPropertyName("sha1")]
+        public string SHA1 { get; set; }
+
+        [JsonPropertyName("size")]
+        public int Size { get; set; }
+
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [JsonPropertyName("path")]
+        public string Path { get; set; }
+
+        [JsonPropertyName("totalSize")]
+        public int TotalSize { get; set; }
+    }
+
+    public class JDownloads
+    {
+        [JsonPropertyName("client")]
+        public JFileInfo Client { get; set; }
+
+        [JsonPropertyName("server")]
+        public JFileInfo Server { get; set; }
+    }
+
+    public class JLibrary
 	{
 		[JsonPropertyName("name")]
 		public string Name { get; set; }
@@ -65,7 +105,16 @@
 		public JExtract Extract { get; set; }
 	}
 
-	public class JRule
+    public class JArguments
+    {
+        [JsonPropertyName("game")]
+        public object[] game { get; set; }
+
+        [JsonPropertyName("jvm")]
+        public object[] jvm { get; set; }
+    }
+
+    public class JRule
 	{
 		[JsonPropertyName("action")]
 		public string Action { get; set; }

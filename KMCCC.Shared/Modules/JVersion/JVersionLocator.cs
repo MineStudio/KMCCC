@@ -70,50 +70,79 @@
 		/// <returns>Version的信息</returns>
 		internal Version GetVersionInternal(string id)
 		{
-			try
-			{
-				if (_locatingVersion.Contains(id))
-				{
-					return null;
-				}
-				_locatingVersion.Add(id);
+            try
+            {
+                if (_locatingVersion.Contains(id))
+                {
+                    return null;
+                }
+                _locatingVersion.Add(id);
 
-				Version version;
-				if (_versions.TryGetValue(id, out version))
-				{
-					return version;
-				}
+                if (_versions.TryGetValue(id, out Version version))
+                {
+                    return version;
+                }
 
-				var jver = LoadVersion(_core.GetVersionJsonPath(id));
-				if (jver == null)
-				{
-					return null;
-				}
+                var jver = LoadVersion(_core.GetVersionJsonPath(id));
+                if (jver == null)
+                {
+                    return null;
+                }
 
-				version = new Version();
-				if (string.IsNullOrWhiteSpace(jver.Id))
-				{
-					return null;
-				}
-				if (string.IsNullOrWhiteSpace(jver.MinecraftArguments))
-				{
-					return null;
-				}
-				if (string.IsNullOrWhiteSpace(jver.MainClass))
-				{
-					return null;
-				}
-				if (string.IsNullOrWhiteSpace(jver.Assets))
-				{
-					jver.Assets = "legacy";
-				}
-				if (jver.Libraries == null)
-				{
-					return null;
-				}
-				version.Id = jver.Id;
-				version.MinecraftArguments = jver.MinecraftArguments;
-				version.Assets = jver.Assets;
+                version = new Version();
+                if (string.IsNullOrWhiteSpace(jver.Id))
+                {
+                    return null;
+                }
+                if (jver.arguments == null && string.IsNullOrWhiteSpace(jver.MinecraftArguments))
+                {
+                    return null;
+                }
+                if (string.IsNullOrWhiteSpace(jver.MainClass))
+                {
+                    return null;
+                }
+                if (string.IsNullOrWhiteSpace(jver.Assets))
+                {
+                    jver.Assets = "legacy";
+                }
+                if (jver.Libraries == null)
+                {
+                    return null;
+                }
+                version.Id = jver.Id;
+                if (jver.AssetsIndex != null)
+                {
+                    version.AssetsIndex = new GameFileInfo()
+                    {
+                        ID = jver.AssetsIndex.ID,
+                        Path = jver.AssetsIndex.Path,
+                        SHA1 = jver.AssetsIndex.SHA1,
+                        Size = jver.AssetsIndex.Size,
+                        TotalSize = jver.AssetsIndex.TotalSize,
+                        Url = jver.AssetsIndex.Url
+                    };
+                }
+                if (jver.Downloads != null)
+                {
+                    version.Downloads = new Download()
+                    {
+                        Client = jver.Downloads.Client != null ? new GameFileInfo()
+                        {
+                            SHA1 = jver.Downloads.Client.SHA1,
+                            Size = jver.Downloads.Client.Size,
+                            Url = jver.Downloads.Client.Url
+                        } : null,
+                        Server = jver.Downloads.Server != null ? new GameFileInfo()
+                        {
+                            SHA1 = jver.Downloads.Server.SHA1,
+                            Size = jver.Downloads.Server.Size,
+                            Url = jver.Downloads.Server.Url
+                        } : null
+                    };
+                }
+                version.MinecraftArguments = jver.MinecraftArguments ?? UsefulTools.PrintfArray(jver.arguments.game);
+                version.Assets = jver.Assets;
 				version.MainClass = jver.MainClass;
 				version.JarId = jver.JarId;
 				version.Libraries = new List<Library>();
@@ -162,7 +191,8 @@
 						}
 					}
 				}
-				if (jver.InheritsVersion != null)
+                
+                if (jver.InheritsVersion != null)
 				{
 					var target = GetVersionInternal(jver.InheritsVersion);
 					if (target == null)
@@ -173,19 +203,24 @@
 					{
                         if (version.Assets == "legacy")
                             version.Assets = null;
+                        version.AssetsIndex = version.AssetsIndex ?? target.AssetsIndex;
+                        version.Downloads = version.Downloads ?? target.Downloads;
                         version.Assets = version.Assets ?? target.Assets;
 						version.JarId = version.JarId ?? target.JarId;
 						version.MainClass = version.MainClass ?? target.MainClass;
 						version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
 						version.Natives.AddRange(target.Natives);
 						version.Libraries.AddRange(target.Libraries);
-					}
+                        version.AssetsIndex = version.AssetsIndex ?? target.AssetsIndex;
+                    }
 				}
-				version.JarId = version.JarId ?? version.Id;
+
+
+                version.JarId = version.JarId ?? version.Id;
 				_versions.Add(version.Id, version);
 				return version;
 			}
-			catch
+			catch(System.Exception ex)
 			{
 				return null;
 			}

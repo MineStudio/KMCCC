@@ -47,15 +47,25 @@
 		/// </summary>
 		public string MinecraftArguments { get; set; }
 
-		/// <summary>
-		///     资源名
-		/// </summary>
-		public string Assets { get; set; }
+        /// <summary>
+        ///     游戏主文件下载信息
+        /// </summary>
+        public Download Downloads { get; set; }
 
-		/// <summary>
-		///     主类
-		/// </summary>
-		public string MainClass { get; set; }
+        /// <summary>
+        ///     资源名
+        /// </summary>
+        public string Assets { get; set; }
+
+        /// <summary>
+        ///    资源文件信息（新版本）
+        /// </summary>
+        public GameFileInfo AssetsIndex { get; set; }
+
+        /// <summary>
+        ///     主类
+        /// </summary>
+        public string MainClass { get; set; }
 
 		/// <summary>
 		///     库列表
@@ -67,10 +77,10 @@
 		/// </summary>
 		public List<Native> Natives { get; set; }
 
-		/// <summary>
-		///     Jar文件（Id）
-		/// </summary>
-		public string JarId { get; set; }
+        /// <summary>
+        ///     Jar文件（Id）
+        /// </summary>
+        public string JarId { get; set; }
 	}
 
 	/// <summary>
@@ -92,12 +102,69 @@
 		///     Version
 		/// </summary>
 		public string Version { get; set; }
-	}
 
-	/// <summary>
-	///     表示本机实现
-	/// </summary>
-	public class Native
+        /// <summary>
+        ///     Url
+        /// </summary>
+        public string Url { get; set; }
+
+        /// <summary>
+        ///     checksums
+        /// </summary>
+        public string[] checksums { get; set; }
+
+        /// <summary>
+        ///     serverreq
+        /// </summary>
+        public bool serverreq { get; set; } = true;
+
+        public bool clientreq { get; set; } = true;
+    }
+
+    public class GameFileInfo
+    {
+        /// <summary>
+        ///     Assets Dd
+        /// </summary>
+        public string ID { get; set; }
+
+        /// <summary>
+        ///     文件SHA1
+        /// </summary>
+        public string SHA1 { get; set; }
+
+        /// <summary>
+        ///     AssetsIndex或Lib文件大小
+        /// </summary>
+        public int Size { get; set; }
+
+        /// <summary>
+        ///     AssetsIndex或Lib下载地址
+        /// </summary>
+        public string Url { get; set; }
+
+        /// <summary>
+        ///     Assets总文件大小
+        /// </summary>
+        public int TotalSize { get; set; }
+
+        /// <summary>
+        ///     Lib文件目录
+        /// </summary>
+        public string Path { get; set; }
+    }
+
+    public class Download
+    {
+        public GameFileInfo Client { get; set; }
+
+        public GameFileInfo Server { get; set; }
+    }
+
+    /// <summary>
+    ///     表示本机实现
+    /// </summary>
+    public class Native
 	{
 		/// <summary>
 		///     NS
@@ -161,7 +228,17 @@
 			return String.Format("{0}/versions/{1}/{1}.json", core.GameRootPath, versionId);
 		}
 
-		public static string GetLibPath(this LauncherCore core, Library lib)
+        public static string GetVersionOptions(this LauncherCore core, Version version)
+        {
+            return GetVersionOptions(core, version.Id);
+        }
+
+        public static string GetVersionOptions(this LauncherCore core, string versionId)
+        {
+            return String.Format(@"{0}\versions\{1}\options.txt", core.GameRootPath, versionId);
+        }
+
+        public static string GetLibPath(this LauncherCore core, Library lib)
 		{
 			return String.Format("{0}/libraries/{1}/{2}/{3}/{2}-{3}.jar", core.GameRootPath, lib.NS.Replace(".", "\\"), lib.Name, lib.Version);
 		}

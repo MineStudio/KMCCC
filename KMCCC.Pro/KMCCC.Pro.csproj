@@ -47,6 +47,11 @@
     </Compile>
     <Compile Include="Launcher\LauncherCore.cs" />
     <Compile Include="Launcher\Reporter.cs" />
+    <Compile Include="Modules\MojangAPI\MojangAPI.cs" />
+    <Compile Include="Modules\MojangAPI\MojangAPIInternal.cs" />
+    <Compile Include="Modules\MojangAPI\MojangAPIProvider.cs" />
+    <Compile Include="Modules\MojangAPI\ServiceStatus.cs" />
+    <Compile Include="Modules\MojangAPI\Statistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

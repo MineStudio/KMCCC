@@ -51,7 +51,7 @@
 		private const string SERVICE_ROOT = @"http://api.kmccc.minestudio.org/v1";
 #endif
 
-		public const string Version = "0.9.5.6";
+		public const string Version = "0.9.5.7";
 
 		private const string LAUNCH_REPORT = SERVICE_ROOT + "/launch";
 
@@ -146,18 +146,20 @@
 			{
 				try
 				{
-					var wc = new WebClient();
-					wc.Headers.Add("user-agent", _clientName);
-					wc.UploadString(LAUNCH_REPORT,
-						JsonMapper.ToJson((_reportLevel == ReportLevel.Full)
-							? new FullLaunchReport(core, result, options)
-							: (_reportLevel == ReportLevel.Basic)
-								? new BasicLaunchReport(core, result, options)
-								: new MinLaunchReport(result, options))
+                    using (var wc = new WebClient())
+                    {
+                        wc.Headers.Add("user-agent", _clientName);
+                        wc.UploadString(LAUNCH_REPORT,
+                            JsonMapper.ToJson((_reportLevel == ReportLevel.Full)
+                                ? new FullLaunchReport(core, result, options)
+                                : (_reportLevel == ReportLevel.Basic)
+                                    ? new BasicLaunchReport(core, result, options)
+                                    : new MinLaunchReport(result, options))
 #if DEBUG
-							.Print()
+                            .Print()
 #endif
-						);
+                        );
+                    }
 				}
 				catch
 				{
