@@ -63,12 +63,24 @@
 			}
 		}
 
-		/// <summary>
-		///     获取Version信息，当出现错误时会返回null
-		/// </summary>
-		/// <param name="id">版本id</param>
-		/// <returns>Version的信息</returns>
-		internal Version GetVersionInternal(string id)
+        private string GetOSSpecifiedNative() {
+            switch(System.Environment.OSVersion.Platform)
+            {
+                case System.PlatformID.Unix:
+                    return "linux";
+                case System.PlatformID.MacOSX:
+                    return "macos";
+                default:
+                    return "windows";
+            }
+        }
+
+        /// <summary>
+        ///     获取Version信息，当出现错误时会返回null
+        /// </summary>
+        /// <param name="id">版本id</param>
+        /// <returns>Version的信息</returns>
+        internal Version GetVersionInternal(string id)
 		{
             try
             {
@@ -182,7 +194,7 @@
 							NS = names[0],
 							Name = names[1],
 							Version = names[2],
-							NativeSuffix = lib.Natives["windows"].Replace("${arch}", SystemTools.GetArch())
+							NativeSuffix = lib.Natives[GetOSSpecifiedNative()].Replace("${arch}", SystemTools.GetArch())
 						};
 						version.Natives.Add(native);
 						if (lib.Extract != null)
@@ -220,9 +232,9 @@
 				_versions.Add(version.Id, version);
 				return version;
 			}
-			catch(System.Exception ex)
-			{
-				return null;
+            catch (System.Exception)
+            {
+                return null;
 			}
 			finally
 			{

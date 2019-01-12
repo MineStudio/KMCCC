@@ -9,13 +9,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Runtime.InteropServices;
-<<<<<<< HEAD
-    using System.Diagnostics;
     using System.IO;
-
-=======
-
->>>>>>> b446f706494341b5337bcedca0188a6cab1c3aae
     #endregion
 
     public class SystemTools
@@ -30,8 +24,8 @@
 			{
                 if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX) // Not Windows
                 {
+                    if (File.Exists("/usr/lib/jvm/java-8-oracle/bin/java")) return new string[] { "/usr/lib/jvm/java-8-oracle/bin/java" };
                     if (File.Exists("/usr/bin/java")) return new string[] { "/usr/bin/java" };
-                    if (File.Exists("/bin/java")) return new string[] { "/bin/java" };
                     return new string[0];
                 }
                 else

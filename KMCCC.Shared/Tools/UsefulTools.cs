@@ -35,11 +35,11 @@
 			}
 			foreach (var file in sourceDir.GetFiles())
 			{
-				File.Copy(file.FullName, target + "\\" + file.Name, true);
+				File.Copy(file.FullName, target + "/" + file.Name, true);
 			}
 			foreach (var subdir in sourceDir.GetDirectories())
 			{
-				Dircopy(subdir.FullName, target + "\\" + subdir.Name);
+				Dircopy(subdir.FullName, target + "/" + subdir.Name);
 			}
 		}
 

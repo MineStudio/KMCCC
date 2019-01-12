@@ -78,12 +78,12 @@ namespace KMCCC.Modules.Minecraft
                     {
                         return JsonMapper.ToObject<PingPayload>(safejson);
                     }
-                    catch(Exception ex)
+                    catch (Exception)
                     {
                         return new PingPayload { description = new Description { text = safejson } };
                     }
                 }
-                catch (IOException ex)
+                catch (IOException)
                 {
                     client.Client.Disconnect(false);
                     return new PingPayload()

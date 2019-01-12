@@ -55,7 +55,7 @@
 				args.Libraries.Add(this.GetVersionJarPath(options.Version.JarId));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
 
-                string AssetsPath = options.Version.Assets == "legacy" ? "assets\\virtual\\legacy" : "assets";
+                string AssetsPath = options.Version.Assets == "legacy" ? "assets/virtual/legacy" : "assets";
                 args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
@@ -67,7 +67,7 @@
 				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
 				args.Tokens.Add("user_properties", authentication.Properties);
 				args.Tokens.Add("user_type", authentication.UserType);
-                args.Tokens.Add("version_type", options.VersionType ?? "KMCCC");
+                args.Tokens.Add("version_type", options.VersionType ?? "KMCCC Universal");
 
                 args.AdvencedArguments = new List<string> {"-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true"};
 
@@ -144,7 +144,7 @@
 			}
 		}
 
-		#region 复制文件夹
+		#region Folder Copying
 
 		public void CopyVersionDirectory(string directoryName, string versionId)
 		{
@@ -190,7 +190,7 @@
 
 		#endregion
 
-		#region 事件
+		#region Events
 
 		internal void Log(LaunchHandle handle, string line)
 		{

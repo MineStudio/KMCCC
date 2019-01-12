@@ -240,12 +240,12 @@
 
         public static string GetLibPath(this LauncherCore core, Library lib)
 		{
-			return String.Format("{0}/libraries/{1}/{2}/{3}/{2}-{3}.jar", core.GameRootPath, lib.NS.Replace(".", "\\"), lib.Name, lib.Version);
+			return String.Format("{0}/libraries/{1}/{2}/{3}/{2}-{3}.jar", core.GameRootPath, lib.NS.Replace(".", "/"), lib.Name, lib.Version);
 		}
 
 		public static string GetNativePath(this LauncherCore core, Native native)
 		{
-			return String.Format("{0}/libraries/{1}/{2}/{3}/{2}-{3}-{4}.jar", core.GameRootPath, native.NS.Replace(".", "\\"), native.Name, native.Version,
+			return String.Format("{0}/libraries/{1}/{2}/{3}/{2}-{3}-{4}.jar", core.GameRootPath, native.NS.Replace(".", "/"), native.Name, native.Version,
 				native.NativeSuffix);
 		}
 	}
