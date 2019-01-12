@@ -33,7 +33,7 @@
 				args.MaxMemory = options.MaxMemory;
                 args.AgentPath = options.AgentPath;
                 args.MinMemory = options.MinMemory;
-				args.NativePath = GameRootPath + @"\$natives";
+				args.NativePath = GameRootPath + @"/$natives";
 				foreach (var native in options.Version.Natives)
 				{
 					var exp = ZipTools.UnzipFile(this.GetNativePath(native), args.NativePath, native.Options);
@@ -151,8 +151,8 @@
 
 		public void CopyVersionDirectory(string directoryName, string versionId)
 		{
-			CopyDirectory(string.Format(@"{0}\versions\{2}\{1}", GameRootPath, directoryName, versionId),
-				string.Format(@"{0}\{1}", GameRootPath, directoryName));
+			CopyDirectory(string.Format("{0}/versions/{2}/{1}", GameRootPath, directoryName, versionId),
+				string.Format("{0}/{1}", GameRootPath, directoryName));
 		}
 
 		public void CopyDirectory(string source, string target)
@@ -180,14 +180,14 @@
 
 		public void CopyVersionDirectories(string ver)
 		{
-			var root = string.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
+			var root = string.Format("{0}/versions/{1}/moddir", GameRootPath, ver);
 			if (!Directory.Exists(root))
 			{
 				return;
 			}
 			foreach (var dir in new DirectoryInfo(root).EnumerateDirectories())
 			{
-				CopyDirectory(dir.FullName, string.Format(@"{0}\{1}", GameRootPath, dir.Name));
+				CopyDirectory(dir.FullName, string.Format("{0}/{1}", GameRootPath, dir.Name));
 			}
 		}
 

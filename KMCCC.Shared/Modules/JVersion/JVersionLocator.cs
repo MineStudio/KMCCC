@@ -53,7 +53,7 @@
 			{
 				lock (_locatingVersion)
 				{
-					return new DirectoryInfo(GameRootPath + @"\versions").EnumerateDirectories()
+					return new DirectoryInfo(GameRootPath + "/versions").EnumerateDirectories()
 						.Select(dir => GetVersionInternal(dir.Name)).Where(item => item != null);
 				}
 			}

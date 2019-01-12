@@ -9,6 +9,7 @@
     using Microsoft.Win32;
     using System.Runtime.InteropServices;
     using System.Diagnostics;
+    using System.IO;
 
     #endregion
 
@@ -22,10 +23,19 @@
 		{
 			try
 			{
-				var rootReg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
-				return rootReg == null
-					? new string[0]
-					: FindJavaInternal(rootReg).Union(FindJavaInternal(rootReg.OpenSubKey("Wow6432Node")));
+                if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX) // Not Windows
+                {
+                    if (File.Exists("/usr/bin/java")) return new string[] { "/usr/bin/java" };
+                    if (File.Exists("/bin/java")) return new string[] { "/bin/java" };
+                    return new string[0];
+                }
+                else
+                {
+                    var rootReg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
+                    return rootReg == null
+                        ? new string[0]
+                        : FindJavaInternal(rootReg).Union(FindJavaInternal(rootReg.OpenSubKey("Wow6432Node")));
+                }
 			}
 			catch
 			{

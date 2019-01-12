@@ -43,7 +43,7 @@
 	{
 		public override bool Operate(LauncherCore core, MinecraftLaunchArguments args)
 		{
-			args.Tokens["game_directory"] = String.Format(@".\versions\{0}\", args.Version.Id);
+			args.Tokens["game_directory"] = String.Format("./versions/{0}/", args.Version.Id);
 			return true;
 		}
 	}
