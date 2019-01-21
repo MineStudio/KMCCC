@@ -205,7 +205,7 @@
 
 		public static string GetVersionRootPath(this LauncherCore core, string versionId)
 		{
-			return String.Format("{0}/versions/{1}/", core.GameRootPath, versionId);
+			return String.Format(SystemTools.GetIsWindows() ? @"{0}\versions\{1}\" : "{0}/versions/{1}/", core.GameRootPath, versionId);
 		}
 
 		public static string GetVersionJarPath(this LauncherCore core, Version version)
@@ -215,7 +215,7 @@
 
 		public static string GetVersionJarPath(this LauncherCore core, string versionId)
 		{
-			return String.Format("{0}/versions/{1}/{1}.jar", core.GameRootPath, versionId);
+			return String.Format(SystemTools.GetIsWindows() ? @"{0}\versions\{1}\{1}.jar" : "{0}/versions/{1}/{1}.jar", core.GameRootPath, versionId);
 		}
 
 		public static string GetVersionJsonPath(this LauncherCore core, Version version)
@@ -225,7 +225,7 @@
 
 		public static string GetVersionJsonPath(this LauncherCore core, string versionId)
 		{
-			return String.Format("{0}/versions/{1}/{1}.json", core.GameRootPath, versionId);
+			return String.Format(SystemTools.GetIsWindows() ? @"{0}\versions\{1}\{1}.json" : "{0}/versions/{1}/{1}.json", core.GameRootPath, versionId);
 		}
 
         public static string GetVersionOptions(this LauncherCore core, Version version)
@@ -235,17 +235,17 @@
 
         public static string GetVersionOptions(this LauncherCore core, string versionId)
         {
-            return String.Format(@"{0}\versions\{1}\options.txt", core.GameRootPath, versionId);
+            return String.Format(SystemTools.GetIsWindows() ? @"{0}\versions\{1}\options.txt" : "{0}/versions/{1}/options.txt", core.GameRootPath, versionId);
         }
 
         public static string GetLibPath(this LauncherCore core, Library lib)
 		{
-			return String.Format("{0}/libraries/{1}/{2}/{3}/{2}-{3}.jar", core.GameRootPath, lib.NS.Replace(".", "/"), lib.Name, lib.Version);
+			return String.Format(SystemTools.GetIsWindows() ? @"{0}\libraries\{1}\{2}\{3}\{2}-{3}.jar" : "{0}/libraries/{1}/{2}/{3}/{2}-{3}.jar", core.GameRootPath, lib.NS.Replace(".", (SystemTools.GetIsWindows() ? @"\" : "/")), lib.Name, lib.Version);
 		}
 
 		public static string GetNativePath(this LauncherCore core, Native native)
 		{
-			return String.Format("{0}/libraries/{1}/{2}/{3}/{2}-{3}-{4}.jar", core.GameRootPath, native.NS.Replace(".", "/"), native.Name, native.Version,
+			return String.Format(SystemTools.GetIsWindows() ? @"{0}\libraries\{1}\{2}\{3}\{2}-{3}-{4}.jar" : "{0}/libraries/{1}/{2}/{3}/{2}-{3}-{4}.jar", core.GameRootPath, native.NS.Replace(".", (SystemTools.GetIsWindows() ? @"\" : "/")), native.Name, native.Version,
 				native.NativeSuffix);
 		}
 	}

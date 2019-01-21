@@ -66,11 +66,16 @@
 			}
 		}
 
-		/// <summary>
-		///     取物理内存
-		/// </summary>
-		/// <returns>物理内存</returns>
-		public static ulong GetTotalMemory()
+        public static bool GetIsWindows()
+        {
+            return Environment.OSVersion.Platform == PlatformID.WinCE || Environment.OSVersion.Platform == PlatformID.Win32S || Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.Win32Windows;
+        }
+
+        /// <summary>
+        ///     取物理内存
+        /// </summary>
+        /// <returns>物理内存</returns>
+        public static ulong GetTotalMemory()
 		{
 			return new Computer().Info.TotalPhysicalMemory;
 		}

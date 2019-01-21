@@ -43,8 +43,8 @@
 	{
 		public override bool Operate(LauncherCore core, MinecraftLaunchArguments args)
 		{
-			args.Tokens["game_directory"] = String.Format(core.GameRootPath + "/versions/{0}/", args.Version.Id);
-			return true;
+            args.Tokens["game_directory"] = Tools.SystemTools.GetIsWindows() ? String.Format(@".\versions\{0}\", args.Version.Id) : String.Format(core.GameRootPath + "/versions/{0}/", args.Version.Id);
+            return true;
 		}
 	}
 

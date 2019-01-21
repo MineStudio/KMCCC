@@ -35,11 +35,11 @@
 			}
 			foreach (var file in sourceDir.GetFiles())
 			{
-				File.Copy(file.FullName, target + "/" + file.Name, true);
+				File.Copy(file.FullName, target + (SystemTools.GetIsWindows() ? @"\" : "/") + file.Name, true);
 			}
 			foreach (var subdir in sourceDir.GetDirectories())
 			{
-				Dircopy(subdir.FullName, target + "/" + subdir.Name);
+				Dircopy(subdir.FullName, target + (SystemTools.GetIsWindows() ? @"\" : "/") + subdir.Name);
 			}
 		}
 
@@ -59,10 +59,12 @@
         {
             long msb = 0;
             long lsb = 0;
+#pragma warning disable CS0675 // Bitwise-or operator used on a sign-extended operand
             for (int i = 0; i < 8; i++)
                 msb = (msb << 8) | (data[i] & 0xff);
             for (int i = 8; i < 16; i++)
                 lsb = (lsb << 8) | (data[i] & 0xff);
+#pragma warning restore CS0675 // Bitwise-or operator used on a sign-extended operand
             return (digits(msb >> 32, 8) + "-" +
                 digits(msb >> 16, 4) + "-" +
                 digits(msb, 4) + "-" +
