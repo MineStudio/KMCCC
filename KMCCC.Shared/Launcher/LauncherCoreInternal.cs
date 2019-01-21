@@ -33,7 +33,7 @@
 				args.MaxMemory = options.MaxMemory;
                 args.AgentPath = options.AgentPath;
                 args.MinMemory = options.MinMemory;
-				args.NativePath = GameRootPath + @"\$natives";
+				args.NativePath = SystemTools.GetIsWindows() ? GameRootPath + @"\$natives" : GameRootPath + "/$natives";
 				foreach (var native in options.Version.Natives)
 				{
 					var exp = ZipTools.UnzipFile(this.GetNativePath(native), args.NativePath, native.Options);
@@ -55,7 +55,7 @@
 				args.Libraries.Add(this.GetVersionJarPath(options.Version.JarId));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
 
-                string AssetsPath = options.Version.Assets == "legacy" ? "assets\\virtual\\legacy" : "assets";
+                string AssetsPath = options.Version.Assets == "legacy" ? (SystemTools.GetIsWindows() ? @"assets\virtual\legacy" : "assets/virtual/legacy") : "assets";
                 args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
@@ -67,7 +67,7 @@
 				args.Tokens.Add("auth_uuid", authentication.UUID.GoString());
 				args.Tokens.Add("user_properties", authentication.Properties);
 				args.Tokens.Add("user_type", authentication.UserType);
-                args.Tokens.Add("version_type", options.VersionType ?? "KMCCC");
+                args.Tokens.Add("version_type", options.VersionType ?? "KMCCC Universal");
 
                 args.AdvencedArguments = new List<string> {"-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true"};
 
@@ -144,13 +144,21 @@
 			}
 		}
 
-		#region 复制文件夹
+		#region Folder Copying
 
 		public void CopyVersionDirectory(string directoryName, string versionId)
 		{
-			CopyDirectory(string.Format(@"{0}\versions\{2}\{1}", GameRootPath, directoryName, versionId),
-				string.Format(@"{0}\{1}", GameRootPath, directoryName));
-		}
+			if(SystemTools.GetIsWindows())
+            {
+                CopyDirectory(string.Format(@"{0}\versions\{2}\{1}", GameRootPath, directoryName, versionId),
+                string.Format(@"{0}\{1}", GameRootPath, directoryName));
+            }
+            else
+            {
+                CopyDirectory(string.Format("{0}/versions/{2}/{1}", GameRootPath, directoryName, versionId),
+                string.Format("{0}/{1}", GameRootPath, directoryName));
+            }
+        }
 
 		public void CopyDirectory(string source, string target)
 		{
@@ -177,20 +185,20 @@
 
 		public void CopyVersionDirectories(string ver)
 		{
-			var root = string.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver);
+			var root = SystemTools.GetIsWindows() ? string.Format(@"{0}\versions\{1}\moddir", GameRootPath, ver) : string.Format("{0}/versions/{1}/moddir", GameRootPath, ver);
 			if (!Directory.Exists(root))
 			{
 				return;
 			}
 			foreach (var dir in new DirectoryInfo(root).EnumerateDirectories())
 			{
-				CopyDirectory(dir.FullName, string.Format(@"{0}\{1}", GameRootPath, dir.Name));
+				CopyDirectory(dir.FullName, (SystemTools.GetIsWindows() ? string.Format(@"{0}\{1}", GameRootPath, dir.Name) : string.Format("{0}/{1}", GameRootPath, dir.Name)));
 			}
 		}
 
 		#endregion
 
-		#region 事件
+		#region Events
 
 		internal void Log(LaunchHandle handle, string line)
 		{

@@ -9,7 +9,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Runtime.InteropServices;
-
+    using System.IO;
     #endregion
 
     public class SystemTools
@@ -22,10 +22,19 @@
 		{
 			try
 			{
-				var rootReg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
-				return rootReg == null
-					? new string[0]
-					: FindJavaInternal(rootReg).Union(FindJavaInternal(rootReg.OpenSubKey("Wow6432Node")));
+                if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX) // Not Windows
+                {
+                    if (File.Exists("/usr/lib/jvm/java-8-oracle/bin/java")) return new string[] { "/usr/lib/jvm/java-8-oracle/bin/java" };
+                    if (File.Exists("/usr/bin/java")) return new string[] { "/usr/bin/java" };
+                    return new string[0];
+                }
+                else
+                {
+                    var rootReg = Registry.LocalMachine.OpenSubKey("SOFTWARE");
+                    return rootReg == null
+                        ? new string[0]
+                        : FindJavaInternal(rootReg).Union(FindJavaInternal(rootReg.OpenSubKey("Wow6432Node")));
+                }
 			}
 			catch
 			{
@@ -57,11 +66,16 @@
 			}
 		}
 
-		/// <summary>
-		///     取物理内存
-		/// </summary>
-		/// <returns>物理内存</returns>
-		public static ulong GetTotalMemory()
+        public static bool GetIsWindows()
+        {
+            return Environment.OSVersion.Platform == PlatformID.WinCE || Environment.OSVersion.Platform == PlatformID.Win32S || Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.Win32Windows;
+        }
+
+        /// <summary>
+        ///     取物理内存
+        /// </summary>
+        /// <returns>物理内存</returns>
+        public static ulong GetTotalMemory()
 		{
 			return new Computer().Info.TotalPhysicalMemory;
 		}

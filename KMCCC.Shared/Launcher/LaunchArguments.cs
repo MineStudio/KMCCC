@@ -119,13 +119,13 @@
 			{
 				sb.Append(' ').Append(adv);
 			}
-			sb.Append(" -Djava.library.path=\"").Append(NativePath);
+            sb.Append(" -Djava.library.path=\"").Append(NativePath);
 			sb.Append("\" -cp \"");
             if (Libraries.Count > 0)
             {
                 foreach (var lib in Libraries)
                 {
-                    sb.Append(lib).Append(';');
+                    sb.Append(lib).Append(':');
                 }
             }
 			sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));

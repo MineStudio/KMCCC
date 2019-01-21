@@ -10,13 +10,14 @@
 	using System.Linq;
 	using System.Reflection;
 	using System.Text;
+    using Ionic.Zip;
 
-	#endregion
+    #endregion
 
-	/// <summary>
-	///     操蛋的通过反射调用Zip解压
-	/// </summary>
-	public static class ZipTools
+    /// <summary>
+    ///     操蛋的通过反射调用Zip解压
+    /// </summary>
+    public static class ZipTools
 	{
 		public static readonly Boolean Enabled;
 
@@ -79,6 +80,11 @@
 				var root = new DirectoryInfo(outputDirectory);
 				root.Create();
 				var rootPath = root.FullName + "/";
+                using (ZipFile zip = ZipFile.Read(zipFile))
+                {
+                    zip.ExtractAll(outputDirectory, ExtractExistingFileAction.OverwriteSilently);
+                }
+                /*
 				using (var zip = (IDisposable) ZipArchive_OpenOnFile.Invoke(null, new object[] {zipFile, FileMode.Open, FileAccess.Read, FileShare.Read, false}))
 				{
 					var ioManager = ZipArchive_ZipIOBlockManager.GetValue(zip);
@@ -115,7 +121,8 @@
 						}
 					}
 				}
-				return null;
+                */
+                return null;
 			}
 			catch (Exception exp)
 			{

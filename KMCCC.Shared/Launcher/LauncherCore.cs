@@ -89,7 +89,7 @@
 
 		public static LauncherCore Create(string gameRootPath = null)
 		{
-			return Create(new LauncherCoreCreationOption(gameRootPath ?? @".minecraft"));
+			return Create(new LauncherCoreCreationOption(gameRootPath ?? ".minecraft"));
 		}
 
 		/// <summary>
