@@ -81,7 +81,13 @@
         ///     Jar文件（Id）
         /// </summary>
         public string JarId { get; set; }
-	}
+
+        /// <summary>
+        ///     特殊Feature启动参数，用于带有条件的启动参数进行判断
+        ///     用于1.13以上版本
+        /// </summary>
+        public Dictionary<string, string> FeatureArguments { get; set; }
+    }
 
 	/// <summary>
 	///     表示库

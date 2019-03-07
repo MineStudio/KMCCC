@@ -110,5 +110,32 @@
             Marshal.WriteInt32(ptr2, i);
             return ptr2;
         }
+
+        /// <summary>
+        ///     获取系统版本
+        /// </summary>
+        /// <returns>System Version</returns>
+        public static string GetSystemVersion()
+        {
+            switch (Environment.OSVersion.Version.Major + "." + Environment.OSVersion.Version.Minor)
+            {
+                case "10.0":
+                    return "10";
+                case "6.3":
+                    return "8.1";
+                case "6.2":
+                    return "8";
+                case "6.1":
+                    return "7";
+                case "6.0":
+                    return "2008";
+                case "5.2":
+                    return "2003";
+                case "5.1":
+                    return "XP";
+                default:
+                    return "unknow";
+            }
+        }
     }
 }

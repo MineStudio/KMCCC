@@ -26,7 +26,8 @@
 			CGCEnabled = true;
 			Tokens = new Dictionary<string, string>();
 			AdvencedArguments = new List<string>();
-		}
+            Features = new List<string>();
+        }
 
 		/// <summary>
 		///     主类
@@ -88,17 +89,23 @@
 		/// </summary>
 		public List<string> AdvencedArguments { get; set; }
 
-		/// <summary>
-		///     转化为String参数
-		/// </summary>
-		/// <returns>转化后的参数</returns>
-		public string ToArguments()
+        /// <summary>
+        ///     启动特性(Feature)
+        /// </summary>
+        public List<string> Features { get; set; }
+
+        /// <summary>
+        ///     转化为String参数
+        /// </summary>
+        /// <returns>转化后的参数</returns>
+        public string ToArguments()
 		{
 			var sb = new StringBuilder();
             if (AgentPath != null && AgentPath != "")
             {
                 sb.Append("-javaagent:\"").Append(this.AgentPath + "\" ");
             }
+            sb.Append("-Dminecraft.client.jar=.minecraft\\versions\\" + Version.Id + "\\" + Version.JarId + ".jar").Append(" ");
             if (CGCEnabled)
 			{
 				sb.Append("-Xincgc");
@@ -128,7 +135,16 @@
                     sb.Append(lib).Append(';');
                 }
             }
-			sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));
+            StringBuilder sb2 = new StringBuilder();
+            foreach (var arg in Version.FeatureArguments)
+            {
+                if (Features.Contains(arg.Key))
+                {
+                    sb2.Append(" ").Append(arg.Value);
+                }
+            }
+            MinecraftArguments += sb2.ToString();
+            sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));
 			if (Server != null)
 			{
 				if (!String.IsNullOrWhiteSpace(Server.Address))

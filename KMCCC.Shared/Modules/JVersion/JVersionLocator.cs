@@ -5,7 +5,8 @@
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
-	using Launcher;
+    using System.Text;
+    using Launcher;
 	using LitJson;
 	using Tools;
 
@@ -141,7 +142,47 @@
                         } : null
                     };
                 }
-                version.MinecraftArguments = jver.MinecraftArguments ?? UsefulTools.PrintfArray(jver.arguments.game);
+                if (!string.IsNullOrEmpty(jver.MinecraftArguments))
+                {
+                    version.MinecraftArguments = jver.MinecraftArguments;
+                }
+                else
+                {
+                    StringBuilder printf = new StringBuilder();
+                    version.FeatureArguments = new Dictionary<string, string>();
+                    if (jver.arguments.game != null)
+                    {
+                        jver.arguments.game.ToList().ForEach(a =>
+                        {
+                            if (a.GetJsonType() != JsonType.String)
+                            {
+                                try
+                                {
+                                    StringBuilder sb2 = new StringBuilder();
+                                    if (a["value"].GetJsonType() == JsonType.Array)
+                                    {
+                                        for (int i = 0; i < a["value"].Count; i++)
+                                        {
+                                            sb2.Append(a["value"][i].ToString()).Append(" ");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sb2.Append(a["value"].ToString());
+                                    }
+                                    version.FeatureArguments.Add(a["rules"][0]["features"].Keys.First(), sb2.ToString());
+                                }
+                                catch { }
+                            }
+                            else
+                            {
+                                printf.Append(a + " ");
+                            }
+                        });
+                    }
+
+                    version.MinecraftArguments = printf.ToString();
+                }
                 version.Assets = jver.Assets;
 				version.MainClass = jver.MainClass;
 				version.JarId = jver.JarId;
@@ -208,8 +249,12 @@
                         version.Assets = version.Assets ?? target.Assets;
 						version.JarId = version.JarId ?? target.JarId;
 						version.MainClass = version.MainClass ?? target.MainClass;
-						version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
-						version.Natives.AddRange(target.Natives);
+                        if (!string.IsNullOrEmpty(jver.MinecraftArguments))
+                            version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
+                        else
+                            version.MinecraftArguments = version.MinecraftArguments + target.MinecraftArguments;
+                        version.FeatureArguments = version.FeatureArguments.Concat(target.FeatureArguments).ToDictionary(k => k.Key, v => v.Value);
+                        version.Natives.AddRange(target.Natives);
 						version.Libraries.AddRange(target.Libraries);
                         version.AssetsIndex = version.AssetsIndex ?? target.AssetsIndex;
                     }
@@ -269,7 +314,15 @@
 				{
 					allowed = rule.Action == "allow";
 				}
-			}
+                if (rule.OS.Arch == "x" + SystemTools.GetArch().Replace("32", "86"))
+                {
+                    allowed = rule.Action == "allow";
+                }
+                if (rule.OS.Version == "^" + SystemTools.GetSystemVersion() + "\\.")
+                {
+                    allowed = rule.Action == "allow";
+                }
+            }
 			return allowed;
 		}
 	}

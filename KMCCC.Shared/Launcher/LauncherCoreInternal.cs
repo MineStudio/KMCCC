@@ -50,7 +50,6 @@
 					};
 				}
 				args.Server = options.Server;
-				args.Size = options.Size;
 				args.Libraries = options.Version.Libraries.Select(this.GetLibPath).ToList();
 				args.Libraries.Add(this.GetVersionJarPath(options.Version.JarId));
 				args.MinecraftArguments = options.Version.MinecraftArguments;
@@ -68,6 +67,18 @@
 				args.Tokens.Add("user_properties", authentication.Properties);
 				args.Tokens.Add("user_type", authentication.UserType);
                 args.Tokens.Add("version_type", options.VersionType ?? "KMCCC");
+
+                if (options.Features.ContainsKey("has_custom_resolution"))
+                {
+                    args.Tokens.Add("resolution_width", options.Size.Width.ToString());
+                    args.Tokens.Add("resolution_height", options.Size.Height.ToString());
+                    args.Size = new WindowSize() { FullScreen = options.Size.FullScreen };
+                    args.Features.Add("has_custom_resolution");
+                }
+                else
+                {
+                    args.Size = options.Size;
+                }
 
                 args.AdvencedArguments = new List<string> {"-Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true"};
 

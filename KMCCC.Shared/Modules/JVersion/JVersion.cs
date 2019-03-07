@@ -108,10 +108,10 @@
     public class JArguments
     {
         [JsonPropertyName("game")]
-        public object[] game { get; set; }
+        public JsonData[] game { get; set; }
 
         [JsonPropertyName("jvm")]
-        public object[] jvm { get; set; }
+        public JsonData[] jvm { get; set; }
     }
 
     public class JRule
@@ -121,13 +121,22 @@
 
 		[JsonPropertyName("os")]
 		public JOperatingSystem OS { get; set; }
-	}
+
+        [JsonPropertyName("features")]
+        public Dictionary<string, object> Features { get; set; }
+    }
 
 	public class JOperatingSystem
 	{
 		[JsonPropertyName("name")]
 		public string Name { get; set; }
-	}
+
+        [JsonPropertyName("version")]
+        public string Version { get; set; }
+
+        [JsonPropertyName("arch")]
+        public string Arch { get; set; }
+    }
 
 	public class JExtract
 	{
