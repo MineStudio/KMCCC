@@ -253,7 +253,8 @@
                             version.MinecraftArguments = version.MinecraftArguments ?? target.MinecraftArguments;
                         else
                             version.MinecraftArguments = version.MinecraftArguments + target.MinecraftArguments;
-                        version.FeatureArguments = version.FeatureArguments.Concat(target.FeatureArguments).ToDictionary(k => k.Key, v => v.Value);
+                        if (target.FeatureArguments!=null)
+                            version.FeatureArguments = version.FeatureArguments.Concat(target.FeatureArguments).ToDictionary(k => k.Key, v => v.Value);
                         version.Natives.AddRange(target.Natives);
 						version.Libraries.AddRange(target.Libraries);
                         version.AssetsIndex = version.AssetsIndex ?? target.AssetsIndex;
