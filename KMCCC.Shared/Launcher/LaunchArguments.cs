@@ -135,16 +135,22 @@
                     sb.Append(lib).Append(';');
                 }
             }
-            StringBuilder sb2 = new StringBuilder();
-            foreach (var arg in Version.FeatureArguments)
-            {
-                if (Features.Contains(arg.Key))
-                {
-                    sb2.Append(" ").Append(arg.Value);
-                }
-            }
-            MinecraftArguments += sb2.ToString();
-            sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));
+
+		    if (Version.FeatureArguments != null)
+		    {
+		        StringBuilder sb2 = new StringBuilder();
+		        foreach (var arg in Version.FeatureArguments)
+		        {
+		            if (Features.Contains(arg.Key))
+		            {
+		                sb2.Append(" ").Append(arg.Value);
+		            }
+		        }
+
+		        MinecraftArguments += sb2.ToString();
+		    }
+
+		    sb.Append("\" ").Append(MainClass).Append(' ').Append(MinecraftArguments.DoReplace(Tokens));
 			if (Server != null)
 			{
 				if (!String.IsNullOrWhiteSpace(Server.Address))

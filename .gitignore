@@ -177,3 +177,5 @@ FakesAssemblies/
 /.vs/KMCCC
 /KMCCC.Shared/Modules/Minecraft/GameOptions.cs
 /KMCCC.Shared/Tools/MinecraftTools.cs
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
