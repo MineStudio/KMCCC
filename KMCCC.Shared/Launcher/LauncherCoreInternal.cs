@@ -55,8 +55,8 @@
 				args.MinecraftArguments = options.Version.MinecraftArguments;
 
                 string AssetsPath = options.Version.Assets == "legacy" ? "assets\\virtual\\legacy" : "assets";
-                args.Tokens.Add("auth_access_token", authentication.AccessToken.GoString());
-				args.Tokens.Add("auth_session", authentication.AccessToken.GoString());
+                args.Tokens.Add("auth_access_token", authentication.AccessToken);
+				args.Tokens.Add("auth_session", authentication.AccessToken);
 				args.Tokens.Add("auth_player_name", authentication.DisplayName);
 				args.Tokens.Add("version_name", options.Version.Id);
 				args.Tokens.Add("game_directory", ".");

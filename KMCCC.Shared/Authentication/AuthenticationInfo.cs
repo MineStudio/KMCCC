@@ -25,7 +25,7 @@
 		/// <summary>
 		///     Session不解释
 		/// </summary>
-		public Guid AccessToken { get; set; }
+		public String AccessToken { get; set; }
 
 		/// <summary>
 		///     各种属性（比如Twitch的Session）
