@@ -6,3 +6,17 @@ build:
   verbosity: minimal
 install: 
   - cmd: set PATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin;C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin;%PATH%
+artifacts:
+- path: kmccc\bin\Release\KMCCC.Pro.dll
+  name: KMCCC.Pro.dll
+- path: kmccc\bin\Release\KMCCC.Basic.dll
+  name: KMCCC.Basic.dll
+- path: kmccc\bin\Release
+  name: Release.zip
+deploy:
+- provider: GitHub
+  tag: KMCCC
+  release: KMCCC
+  auth_token:
+    secure: DQNx2acs4AQQsdPe1w25zNLjrGei/UgJk13BejoAvZUSLFmu+8yKoDra5h2rbwHo
+  draft: true
