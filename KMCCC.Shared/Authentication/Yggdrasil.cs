@@ -143,7 +143,7 @@ namespace KMCCC.Authentication
         /// <param name="accessToken">合法的Token</param>
         /// <param name="twitchEnabled">是否启用Twitch</param>
         /// <param name="clientToken">clientToken</param>
-        public YggdrasilRefresh(Guid accessToken, bool twitchEnabled, Guid clientToken, string authServer = null)
+        public YggdrasilRefresh(String accessToken, bool twitchEnabled, Guid clientToken, string authServer = null)
         {
             AccessToken = accessToken;
             TwitchEnabled = twitchEnabled;
@@ -156,12 +156,12 @@ namespace KMCCC.Authentication
         /// </summary>
         /// <param name="accessToken">合法的Token</param>
         /// <param name="twitchEnabled">是否启用Twitch</param>
-        public YggdrasilRefresh(Guid accessToken, bool twitchEnabled, string authServer = null)
+        public YggdrasilRefresh(String accessToken, bool twitchEnabled, string authServer = null)
             : this(accessToken, twitchEnabled, Guid.NewGuid(), authServer)
         {
         }
 
-        public Guid AccessToken { get; }
+        public String AccessToken { get; }
 
         /// <summary>
         ///     是否启用Twitch
@@ -225,7 +225,7 @@ namespace KMCCC.Authentication
         /// <param name="DisplayName">游戏名，如果设置错误将导致无法进入正版服务器</param>
         /// <param name="uuid">UUID，如果设置错误将导致无法进入正版服务器</param>
         /// <param name="authServer"></param>
-        public YggdrasilValidate(Guid accessToken, Guid clientToken, Guid uuid, string displayName, string authServer = null)
+        public YggdrasilValidate(String accessToken, Guid clientToken, Guid uuid, string displayName, string authServer = null)
         {
             AccessToken = accessToken;
             ClientToken = clientToken;
@@ -236,7 +236,7 @@ namespace KMCCC.Authentication
 
         public string Type => "KMCCC.Yggdrasil";
 
-        public Guid AccessToken { get; }
+        public String AccessToken { get; }
 
         /// <summary>
         /// </summary>
@@ -342,11 +342,11 @@ namespace KMCCC.Authentication
 
         private IEnumerable<IAuthenticator> TryQueue()
         {
-            if (Guid.TryParse(AccessToken, out Guid at) && Guid.TryParse(ClientToken, out Guid ct))
+            if (Guid.TryParse(ClientToken, out Guid ct))
             {
                 if (Guid.TryParse(UUID, out Guid id))
-                    yield return new YggdrasilValidate(at, ct, id, DisplayName, AuthServer);
-                yield return new YggdrasilRefresh(at, false, ct, AuthServer);
+                    yield return new YggdrasilValidate(AccessToken, ct, id, DisplayName, AuthServer);
+                yield return new YggdrasilRefresh(AccessToken, false, ct, AuthServer);
             }
             yield return new YggdrasilLogin(Email, Password, false, null, AuthServer);
         }

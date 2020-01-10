@@ -44,7 +44,7 @@ namespace KMCCC.Modules.Yggdrasil
 		}
 
 		public Guid ClientToken { get; }
-		public Guid AccessToken { get; private set; }
+		public String AccessToken { get; private set; }
 		public Guid UUID { get; private set; }
 		public string DisplayName { get; private set; }
 		public string Properties { get; private set; }
@@ -54,7 +54,7 @@ namespace KMCCC.Modules.Yggdrasil
 		{
 			lock (_locker)
 			{
-				AccessToken = Guid.Empty;
+				AccessToken = Guid.Empty.ToString();
 				UUID = Guid.Empty;
 				DisplayName = string.Empty;
 				Properties = string.Empty;
@@ -64,7 +64,7 @@ namespace KMCCC.Modules.Yggdrasil
 
 		private void UpdateFomrResponse(AuthenticationResponse response)
 		{
-			AccessToken = Guid.Parse(response.AccessToken);
+			AccessToken = response.AccessToken;
 			if (response.User != null)
 			{
 				AccountType = response.User.Legacy ? "Legacy" : "Mojang";
@@ -94,7 +94,7 @@ namespace KMCCC.Modules.Yggdrasil
                         var requestBody = JsonMapper.ToJson(new RefreshRequest
                         {
                             Agent = Agent.Minecraft,
-                            AccessToken = AccessToken.ToString("N"),
+                            AccessToken = AccessToken,
                             RequestUser = twitchEnabled,
                             ClientToken = ClientToken.ToString("N")
                         });
@@ -130,7 +130,7 @@ namespace KMCCC.Modules.Yggdrasil
             }
 		}
 
-		public Exception Refresh(Guid accessToken, bool twitchEnabled = true)
+		public Exception Refresh(String accessToken, bool twitchEnabled = true)
 		{
 			lock (_locker)
 			{
@@ -142,7 +142,7 @@ namespace KMCCC.Modules.Yggdrasil
                         var requestBody = JsonMapper.ToJson(new RefreshRequest
                         {
                             Agent = Agent.Minecraft,
-                            AccessToken = accessToken.ToString("N"),
+                            AccessToken = accessToken,
                             RequestUser = twitchEnabled,
                             ClientToken = ClientToken.ToString("N")
                         });
@@ -178,7 +178,7 @@ namespace KMCCC.Modules.Yggdrasil
 			}
 		}
 
-        public Exception AuthToken(Guid accessToken, Guid uuid, string displayName)
+        public Exception AuthToken(String accessToken, Guid uuid, string displayName)
         {
             lock (_locker)
             {
@@ -192,7 +192,7 @@ namespace KMCCC.Modules.Yggdrasil
                     Http.Timeout = 100000;
                     var requestBody = JsonMapper.ToJson(new ValidateRequest
                     {
-                        AccessToken = accessToken.ToString("N"),
+                        AccessToken = accessToken,
                         ClientToken = ClientToken.ToString("N"),
                     });
                     byte[] postdata = Encoding.UTF8.GetBytes(requestBody);
@@ -204,7 +204,7 @@ namespace KMCCC.Modules.Yggdrasil
                         {
                             var LoginInfo = new AuthenticationResponse()
                             {
-                                AccessToken = accessToken.ToString("N"),
+                                AccessToken = accessToken,
                                 ClientToken = ClientToken.ToString("N"),
                                 SelectedProfile = new GameProfile()
                                 {

@@ -54,7 +54,7 @@
 			}
 			return new AuthenticationInfo
 			{
-				AccessToken = Guid.NewGuid(),
+				AccessToken = Guid.NewGuid().ToString(),
 				DisplayName = DisplayName,
 				UUID = Tools.UsefulTools.GetPlayerUuid("DisplayName"),
                 Properties = "{}",
